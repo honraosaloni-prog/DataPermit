@@ -1,0 +1,11 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="256" height="256" rx="52" fill="#171B22"/>
+
+  <!-- Data cell: bold outline square, upper-left -->
+  <rect x="34" y="34" width="100" height="100" rx="14" fill="none" stroke="#F4F5F6" stroke-width="16"/>
+
+  <!-- Permission gate: filled square with checkmark, lower-right, overlapping for a locked-together feel -->
+  <rect x="122" y="122" width="100" height="100" rx="14" fill="#2B6CB5"/>
+  <path d="M150 172 L168 190 L200 152" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
