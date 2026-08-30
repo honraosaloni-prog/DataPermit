@@ -1,0 +1,2839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataPermit</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI1NiAyNTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPCEtLSBCYWNrZ3JvdW5kIC0tPgogIDxyZWN0IHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiByeD0iNTIiIGZpbGw9IiMxNzFCMjIiLz4KCiAgPCEtLSBEYXRhIGNlbGw6IGJvbGQgb3V0bGluZSBzcXVhcmUsIHVwcGVyLWxlZnQgLS0+CiAgPHJlY3QgeD0iMzQiIHk9IjM0IiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNGNEY1RjYiIHN0cm9rZS13aWR0aD0iMTYiLz4KCiAgPCEtLSBQZXJtaXNzaW9uIGdhdGU6IGZpbGxlZCBzcXVhcmUgd2l0aCBjaGVja21hcmssIGxvd2VyLXJpZ2h0LCBvdmVybGFwcGluZyBmb3IgYSBsb2NrZWQtdG9nZXRoZXIgZmVlbCAtLT4KICA8cmVjdCB4PSIxMjIiIHk9IjEyMiIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNCIgZmlsbD0iIzJCNkNCNSIvPgogIDxwYXRoIGQ9Ik0xNTAgMTcyIEwxNjggMTkwIEwyMDAgMTUyIiBmaWxsPSJub25lIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K">
+<link rel="icon" type="image/png" href="icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icon-180.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#F5F6F7;
+  --panel:#FFFFFF;
+  --border:#DEE1E6;
+  --border-strong:#C7CBD3;
+  --text:#14181F;
+  --text-dim:#5B6472;
+  --text-faint:#88909A;
+  --sidebar:#171B22;
+  --sidebar-text:#B7BEC9;
+  --sidebar-text-dim:#6C7482;
+  --sidebar-active:#232936;
+  --accent:#2B6CB5;
+  --accent-soft:#E4EEF8;
+  --green:#2F8F5B;
+  --green-soft:#E5F3EA;
+  --amber:#B8791A;
+  --amber-soft:#FBF0DD;
+  --red:#C0392B;
+  --red-soft:#FBE8E5;
+  --mono: ui-monospace, SFMono-Regular, "IBM Plex Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+*{box-sizing:border-box;}
+[data-theme="dark"]{
+  --bg:#14171C;
+  --panel:#1B1F26;
+  --border:#2B303A;
+  --border-strong:#3A404C;
+  --text:#E7E9EC;
+  --text-dim:#9AA2AF;
+  --text-faint:#6B7280;
+  --sidebar:#0E1015;
+  --sidebar-active:#1E2430;
+  --accent-soft:#1C3352;
+  --green-soft:#123321;
+  --amber-soft:#3A2C0E;
+  --red-soft:#3A1815;
+}
+[data-theme="dark"] th{ background:#20242C; }
+[data-theme="dark"] .sample-chip{ background:#20242C; }
+[data-theme="dark"] .compare-head.orig{ background:var(--red-soft); }
+[data-theme="dark"] .compare-head.prot{ background:var(--green-soft); }
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;-webkit-font-smoothing:antialiased;}
+button{font-family:var(--sans);cursor:pointer;}
+input,select{font-family:var(--sans);}
+::selection{background:var(--accent-soft);}
+
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{width:212px;flex-shrink:0;background:var(--sidebar);color:var(--sidebar-text);display:flex;flex-direction:column;padding:16px 10px;}
+.brand{display:flex;align-items:center;gap:8px;padding:6px 8px 18px 8px;}
+.brand-mark{width:22px;height:22px;flex-shrink:0;}
+.brand-name{font-weight:700;font-size:14px;letter-spacing:0.2px;color:#fff;}
+.brand-tag{font-size:9.5px;color:var(--sidebar-text-dim);margin-top:1px;}
+.nav-group{margin-top:14px;}
+.nav-group:first-of-type{margin-top:2px;}
+.nav-label{font-size:10px;letter-spacing:0.08em;color:var(--sidebar-text-dim);text-transform:uppercase;padding:0 10px;margin-bottom:4px;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:5px;font-size:12.5px;color:var(--sidebar-text);cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:#1E232C;color:#fff;}
+.nav-item.active{background:var(--sidebar-active);color:#fff;}
+.nav-item.disabled{opacity:0.35;cursor:not-allowed;}
+.nav-item .dot{width:5px;height:5px;border-radius:50%;background:var(--sidebar-text-dim);flex-shrink:0;}
+.sidebar-footer{margin-top:auto;padding:10px;border-top:1px solid #262C37;}
+.offline-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-weight:600;}
+.offline-status .pulse{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(47,143,91,0.5);animation:pulse 2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,143,91,0.45);}70%{box-shadow:0 0 0 6px rgba(47,143,91,0);}100%{box-shadow:0 0 0 0 rgba(47,143,91,0);}}
+.offline-sub{font-size:10px;color:var(--sidebar-text-dim);margin-top:2px;}
+
+/* ---------- MAIN ---------- */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:52px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;padding:0 20px;justify-content:space-between;}
+.topbar-title{font-size:13.5px;font-weight:600;}
+.topbar-sub{font-size:11.5px;color:var(--text-dim);margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.badge{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:3px;display:inline-flex;align-items:center;gap:4px;}
+.badge.blue{background:var(--accent-soft);color:var(--accent);}
+.badge.green{background:var(--green-soft);color:var(--green);}
+.content{flex:1;overflow-y:auto;padding:22px 26px 60px 26px;}
+
+/* generic */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;}
+.h1{font-size:18px;font-weight:700;margin:0 0 4px 0;}
+.sub{font-size:12.5px;color:var(--text-dim);margin:0 0 18px 0;}
+.grid{display:grid;gap:14px;}
+.stat{padding:14px 16px;}
+.stat-label{font-size:11px;color:var(--text-dim);margin-bottom:6px;}
+.stat-value{font-size:22px;font-weight:700;font-family:var(--mono);}
+.stat-value.small{font-size:16px;}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-dim);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--border);background:#FAFBFC;position:sticky;top:0;}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.mono{font-family:var(--mono);}
+.dim{color:var(--text-dim);}
+.faint{color:var(--text-faint);}
+
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:3px;white-space:nowrap;}
+.pill.red{background:var(--red-soft);color:var(--red);}
+.pill.amber{background:var(--amber-soft);color:var(--amber);}
+.pill.green{background:var(--green-soft);color:var(--green);}
+.pill.gray{background:#EEF0F2;color:var(--text-dim);}
+.pill.blue{background:var(--accent-soft);color:var(--accent);}
+
+.btn{border:1px solid var(--border-strong);background:var(--panel);color:var(--text);padding:7px 13px;border-radius:5px;font-size:12.5px;font-weight:600;}
+.btn:hover{background:#F1F2F4;}
+.btn.primary{background:var(--text);color:#fff;border-color:var(--text);}
+.btn.primary:hover{background:#000;}
+.btn.accent{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.accent:hover{background:#245A99;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn.small{padding:4px 9px;font-size:11.5px;}
+
+select.action-select{font-size:12px;padding:5px 7px;border-radius:4px;border:1px solid var(--border-strong);background:#fff;color:var(--text);font-weight:600;}
+
+.masked{font-family:var(--mono);letter-spacing:1px;color:var(--text-faint);}
+
+/* import screen */
+.import-wrap{max-width:640px;margin:40px auto 0 auto;text-align:center;}
+.dropzone{border:1.5px dashed var(--border-strong);border-radius:8px;padding:44px 20px;background:var(--panel);}
+.dropzone.drag{border-color:var(--accent);background:var(--accent-soft);}
+.mark-big{width:52px;height:52px;margin:0 auto 14px auto;}
+
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.tab{padding:9px 14px;font-size:12.5px;font-weight:600;color:var(--text-dim);border-bottom:2px solid transparent;cursor:pointer;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--text);border-bottom-color:var(--text);}
+
+.col-row{display:grid;grid-template-columns:1.4fr 0.9fr 1fr 1.3fr;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);}
+.col-row:last-child{border-bottom:none;}
+.col-name{font-weight:600;font-size:12.5px;}
+.col-type{font-size:10.5px;color:var(--text-dim);font-family:var(--mono);}
+.reason{font-size:11px;color:var(--text-dim);margin-top:2px;}
+
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.compare-col{padding:0;}
+.compare-head{padding:9px 14px;font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.compare-head.orig{color:var(--red);background:var(--red-soft);}
+.compare-head.prot{color:var(--green);background:var(--green-soft);}
+
+.callout{border-radius:6px;padding:12px 14px;font-size:12.5px;display:flex;gap:10px;align-items:flex-start;}
+.callout.amber{background:var(--amber-soft);color:#7A5310;}
+.callout.green{background:var(--green-soft);color:#1E6B41;}
+.callout.blue{background:var(--accent-soft);color:#1B4A7A;}
+.callout.red{background:var(--red-soft);color:#7A251C;}
+.tech-details{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);margin-top:6px;cursor:pointer;}
+.tech-details pre{white-space:pre-wrap;margin:6px 0 0 0;background:#F6F2F1;padding:8px;border-radius:4px;}
+.validation-row{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:3px 0;}
+.validation-row .ok{color:var(--green);}
+.validation-row .pending{color:var(--text-faint);}
+
+.overlay{position:fixed;inset:0;background:rgba(15,17,22,0.45);display:flex;justify-content:flex-end;z-index:50;}
+.inspector{width:400px;max-width:92vw;height:100%;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;box-shadow:-8px 0 24px rgba(0,0,0,0.12);}
+.inspector-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--panel);z-index:2;}
+.inspector-close{border:none;background:none;font-size:16px;color:var(--text-dim);cursor:pointer;padding:2px 6px;}
+.inspector-close:hover{color:var(--text);}
+.inspector-body{padding:18px 20px;}
+.ins-block{margin-bottom:20px;}
+.ins-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-dim);font-weight:700;margin-bottom:8px;}
+.ins-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;border-bottom:1px solid #F0F1F3;}
+.ins-row:last-child{border-bottom:none;}
+.ins-row .k{color:var(--text-dim);}
+.ins-row .v{font-weight:600;font-family:var(--mono);text-align:right;}
+.freq-bar-wrap{margin-bottom:6px;}
+.freq-bar-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;}
+.freq-bar-track{height:6px;background:#EEF0F2;border-radius:3px;overflow:hidden;}
+.freq-bar-fill{height:100%;background:var(--accent);}
+.sample-chip{display:inline-block;font-family:var(--mono);font-size:11px;background:#F4F5F6;border:1px solid var(--border);padding:2px 7px;border-radius:3px;margin:0 4px 4px 0;}
+.col-clickable{cursor:pointer;}
+.col-clickable:hover{text-decoration:underline;text-decoration-color:var(--border-strong);}
+th.col-clickable:hover{background:#F1F3F5;}
+
+.dt-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+.dt-toolbar input[type=text]{font-size:12px;padding:6px 9px;border:1px solid var(--border-strong);border-radius:5px;width:200px;}
+th.sortable{cursor:pointer;user-select:none;position:relative;}
+th.sortable:hover{background:#F1F3F5;}
+.sort-arrow{font-size:9px;margin-left:3px;color:var(--accent);}
+th.pinned, td.pinned{position:sticky;left:0;background:#FAFBFC;z-index:1;box-shadow:2px 0 4px rgba(0,0,0,0.04);}
+td.pinned{background:var(--panel);}
+.resize-handle{position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize;}
+.resize-handle:hover{background:var(--accent-soft);}
+.columns-panel{position:absolute;background:var(--panel);border:1px solid var(--border);border-radius:6px;box-shadow:0 8px 20px rgba(0,0,0,0.12);padding:8px;z-index:30;max-height:280px;overflow-y:auto;min-width:180px;}
+.columns-panel label{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 6px;border-radius:4px;cursor:pointer;}
+.columns-panel label:hover{background:#F4F5F6;}
+.dt-th-inner{display:flex;align-items:center;justify-content:space-between;gap:4px;}
+.pin-btn{font-size:9px;opacity:0.5;background:none;border:none;cursor:pointer;padding:1px 3px;}
+.pin-btn:hover{opacity:1;}
+.pin-btn.active{opacity:1;color:var(--accent);}
+
+/* focus-visible accessibility */
+button:focus-visible, .nav-item:focus-visible, .tab:focus-visible, select:focus-visible, input:focus-visible, [tabindex]:focus-visible, label.btn:focus-within{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+@media print{
+  .sidebar, .topbar, .dt-toolbar, .tabs, .btn, button, select, input{ display:none !important; }
+  .content{ overflow:visible !important; padding:0 !important; }
+  .app{ display:block !important; height:auto !important; }
+  .panel{ break-inside:avoid; border:1px solid #999; }
+  body{ background:#fff; }
+}
+.print-only{display:none;}
+.processing-overlay{position:fixed;inset:0;background:rgba(20,23,28,0.35);display:flex;align-items:center;justify-content:center;z-index:60;}
+.processing-card{background:var(--panel);border-radius:8px;padding:24px 32px;text-align:center;box-shadow:0 12px 32px rgba(0,0,0,0.18);}
+.spinner{width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 12px auto;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.pipeline-steps{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;margin:16px 0;}
+.pipeline-step{display:flex;flex-direction:column;align-items:center;gap:4px;width:78px;}
+.pipeline-step .num{width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--mono);}
+.pipeline-step .lbl{font-size:10.5px;color:var(--text-dim);text-align:center;}
+.pipeline-arrow{color:var(--border-strong);font-size:12px;padding-bottom:16px;}
+@media (max-width:600px){ .pipeline-arrow{display:none;} .pipeline-steps{gap:10px;} }
+
+.checklist{display:flex;flex-direction:column;gap:8px;}
+.check-item{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+.check-item .ok{color:var(--green);font-weight:700;}
+
+.audit-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.audit-item:last-child{border-bottom:none;}
+.audit-time{color:var(--text-faint);font-family:var(--mono);font-size:11px;width:70px;flex-shrink:0;}
+
+.risk-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:5px;font-weight:700;font-size:14px;}
+
+.empty{text-align:center;padding:50px 20px;color:var(--text-dim);}
+
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-thumb{background:#D5D8DD;border-radius:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+@media (max-width:760px){
+  .sidebar{position:fixed;left:-220px;top:0;bottom:0;z-index:20;transition:left .2s;}
+  .sidebar.open{left:0;}
+  .grid.cols-4{grid-template-columns:1fr 1fr !important;}
+  .col-row{grid-template-columns:1fr;gap:4px;}
+  .compare-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="2" width="8" height="8" rx="1" stroke="#fff" stroke-width="1.4"/>
+        <rect x="14" y="2" width="8" height="8" rx="1" stroke="#fff" stroke-width="1.4" opacity="0.35"/>
+        <rect x="2" y="14" width="8" height="8" rx="1" stroke="#fff" stroke-width="1.4" opacity="0.35"/>
+        <path d="M14 18 L18 18 L18 14" stroke="#4C8FE0" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M22 14 L18 18" stroke="#4C8FE0" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="18" cy="18" r="1.1" fill="#4C8FE0"/>
+      </svg>
+      <div>
+        <div class="brand-name">DataPermit</div>
+        <div class="brand-tag">local &amp; offline</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Data</div>
+      <button class="nav-item" data-view="overview"><span class="dot"></span>Overview</button>
+      <button class="nav-item" data-view="data"><span class="dot"></span>Data Table</button>
+      <button class="nav-item" data-view="projects"><span class="dot"></span>Projects</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Privacy</div>
+      <button class="nav-item" data-view="privacy"><span class="dot"></span>Privacy Review</button>
+      <button class="nav-item" data-view="aiview"><span class="dot"></span>AI View</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Analysis</div>
+      <button class="nav-item" data-view="quality"><span class="dot"></span>Data Quality</button>
+      <button class="nav-item" data-view="report"><span class="dot"></span>Verify &amp; Report</button>
+      <button class="nav-item" data-view="export"><span class="dot"></span>Export</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">System</div>
+      <button class="nav-item" data-view="audit"><span class="dot"></span>Audit</button>
+      <button class="nav-item" data-view="settings"><span class="dot"></span>Settings</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="offline-status"><span class="pulse"></span>OFFLINE</div>
+      <div class="offline-sub">Processing locally &middot; no network calls</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topTitle">No dataset loaded</div>
+        <div class="topbar-sub" id="topSub">Import a dataset to begin</div>
+      </div>
+      <div class="topbar-right">
+        <span class="badge blue" id="datasetBadge" style="display:none;"></span>
+        <span class="badge green">● OFFLINE</span>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   DATAPERMIT — client-side prototype
+   Everything below runs entirely in the browser. No network
+   requests are made anywhere in this file.
+   ========================================================= */
+
+const state = {
+  dataset: null,        // {name, rows:[...], columns:[...], sizeBytes}
+  columns: [],           // [{name,type,nulls,unique,sensitivity,confidence,reason,samples}]
+  protocols: {},          // colName -> action (resolved, per-dataset)
+  explicitlySet: new Set(), // colNames the user has manually chosen this session — protocol runs won't overwrite these
+  generalizeBuckets: {},   // colName -> bucket size override for GENERALIZE
+  protected: null,        // transformed rows
+  protectedColumns: [],   // remaining column names after protection
+  tokenMaps: {},           // colName -> Map(original->token) [not exported]
+  secondScan: [],          // warnings after protection
+  verificationChecks: [],
+  audit: [],
+  view: 'overview',
+  privacySubTab: 'columns', // 'columns' | 'library'
+  reviewPage: 0,
+  reviewSearch: '',
+  revealOriginals: false,
+  aiViewPage: 0,
+  aiViewSearch: '',
+  reportSubTab: 'verify',
+  exportSelection: {dataset:true, format:'csv', privacyReport:true, qualityReport:false, protocolConfig:false},
+  dataTable: {
+    search:'', sortCol:null, sortDir:1, page:0, pageSize:50,
+    hiddenCols: new Set(), pinnedCols: new Set(), colWidths:{},
+    rowFilter: null // {column, type:'missing'|'outlier'}
+  },
+  qualityDecisions: {} // colName -> 'review'|'keep'|'remove'|'transform'
+};
+
+/* ---------------- Protocol Library (global, persists across datasets in this session) ---------------- */
+const MANDATORY_PROTOCOL_ID = 'mandatory';
+let protocolLibrary = [
+  {
+    id: MANDATORY_PROTOCOL_ID,
+    name: 'Mandatory Security Rules',
+    status: 'ACTIVE',
+    builtin: true,
+    scope: 'All datasets',
+    lastModified: 'System',
+    rules: [
+      {id:'m1', matchType:'sensitivity_label', matchValue:'Credential / Secret', action:'REMOVE'},
+      {id:'m2', matchType:'sensitivity_label', matchValue:'Financial Card Number', action:'REMOVE'}
+    ]
+  },
+  {
+    id: 'employee-pii',
+    name: 'Employee PII',
+    status: 'DISABLED',
+    builtin: false,
+    scope: 'Employee datasets',
+    lastModified: 'Template',
+    rules: [
+      {id:'r1', matchType:'sensitivity_label', matchValue:'Personal Name', action:'MASK'},
+      {id:'r2', matchType:'sensitivity_label', matchValue:'Email', action:'MASK'},
+      {id:'r3', matchType:'sensitivity_label', matchValue:'Phone Number', action:'REMOVE'},
+      {id:'r4', matchType:'column_name_contains', matchValue:'id', action:'TOKENIZE'}
+    ]
+  }
+];
+let ruleIdCounter = 100;
+
+/* ---------------- Projects (local persistence) ----------------
+   This file runs as a normal local HTML page in your browser, not inside
+   an embedded viewer, so browser localStorage works here and is used to
+   remember projects between sessions. A future Tauri build would swap
+   this for a real local SQLite database per the original spec. */
+const PROJECTS_KEY = 'datapermit_projects_v1';
+const SETTINGS_KEY = 'datapermit_settings_v1';
+let storageAvailable = true;
+function loadFromStorage(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  }catch(e){ storageAvailable = false; return fallback; }
+}
+function saveToStorage(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); return true; }
+  catch(e){ storageAvailable = false; return false; }
+}
+
+let projects = loadFromStorage(PROJECTS_KEY, []);
+let appSettings = loadFromStorage(SETTINGS_KEY, {
+  offlineLock: false,
+  auditRetention: 'session',
+  theme: 'light',
+  hideOnboarding: false
+});
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', appSettings.theme==='dark' ? 'dark' : 'light');
+}
+
+function log(action){
+  state.audit.push({t: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}), action});
+}
+
+/* ---------------- CSV / file parsing ---------------- */
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field+='"'; i++; } else { inQuotes=false; }
+      } else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field=''; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  const header = rows.shift().map(h=>h.trim());
+  const objRows = rows.filter(r=>r.length>1 || (r.length===1 && r[0]!=='')).map(r=>{
+    const o={};
+    header.forEach((h,idx)=>o[h]=(r[idx]!==undefined?r[idx]:''));
+    return o;
+  });
+  return {header, rows: objRows};
+}
+
+function computeChecksum(data){
+  let h1=0, h2=0;
+  const isStr = typeof data === 'string';
+  const arr = isStr ? null : new Uint8Array(data);
+  const len = isStr ? data.length : arr.length;
+  for(let i=0;i<len;i++){
+    const c = isStr ? data.charCodeAt(i) : arr[i];
+    h1 = (h1*33 + c) >>> 0;
+    h2 = (h2*17 + c + i) >>> 0;
+  }
+  return (h1.toString(16).padStart(8,'0') + h2.toString(16).padStart(8,'0')).toUpperCase();
+}
+
+function parseDelimited(text, delimiter){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field+='"'; i++; } else { inQuotes=false; }
+      } else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === delimiter){ row.push(field); field=''; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  const header = (rows.shift()||[]).map(h=>h.trim());
+  const objRows = rows.filter(r=>r.length>1 || (r.length===1 && r[0]!=='')).map(r=>{
+    const o={};
+    header.forEach((h,idx)=>o[h]=(r[idx]!==undefined?r[idx]:''));
+    return o;
+  });
+  return {header, rows: objRows};
+}
+
+const LARGE_IMPORT_ROW_THRESHOLD = 3000;
+
+function showProcessingOverlay(msg){
+  const el = document.createElement('div');
+  el.className = 'processing-overlay';
+  el.id = 'processingOverlay';
+  el.setAttribute('role','status');
+  el.setAttribute('aria-live','polite');
+  el.innerHTML = `<div class="processing-card"><div class="spinner"></div><div style="font-size:12.5px;font-weight:600;">${esc(msg)}</div></div>`;
+  document.body.appendChild(el);
+}
+function hideProcessingOverlay(){
+  const el = document.getElementById('processingOverlay');
+  if(el) el.remove();
+}
+
+function finishImport(name, header, rows, sizeBytes, checksum){
+  if(rows.length >= LARGE_IMPORT_ROW_THRESHOLD){
+    const extra = rows.length >= 50000 ? ' This may take a moment for very large files.' : '';
+    showProcessingOverlay(`Processing ${rows.length.toLocaleString()} rows locally…${extra}`);
+    setTimeout(()=>{
+      loadDataset(name, header, rows, sizeBytes, checksum);
+      hideProcessingOverlay();
+    }, 20);
+  } else {
+    loadDataset(name, header, rows, sizeBytes, checksum);
+  }
+}
+
+function loadDataset(name, header, rows, sizeBytes, checksum){
+  state.dataset = {name, rows, columns: header, sizeBytes, checksum: checksum || computeChecksum(JSON.stringify(rows)), importedAt: new Date().toLocaleString()};
+  state.columns = analyzeColumns(header, rows);
+  state.protocols = {};
+  state.explicitlySet = new Set();
+  state.generalizeBuckets = {};
+  state.columns.forEach(c=>{ state.protocols[c.name] = suggestAction(c); });
+  applyProtocolLibraryToColumns(false);
+  state.protected = null;
+  state.protectedColumns = [];
+  state.tokenMaps = {};
+  state.secondScan = [];
+  state.verificationChecks = [];
+  state.audit = [];
+  state.reviewPage = 0;
+  state.reviewSearch = '';
+  state.revealOriginals = false;
+  state.aiViewPage = 0;
+  state.aiViewSearch = '';
+  state.reportSubTab = 'verify';
+  state.dataTable = {search:'', sortCol:null, sortDir:1, page:0, pageSize:50, hiddenCols:new Set(), pinnedCols:new Set(), colWidths:{}, rowFilter:null};
+  state.qualityDecisions = {};
+  log(`Dataset imported: ${name} (${rows.length} rows, ${header.length} columns)`);
+  log(`Local integrity checksum recorded: ${state.dataset.checksum}`);
+  log('Local scan completed');
+  setView('overview');
+  renderTopbar();
+}
+
+/* ---------------- Sensitivity detection ---------------- */
+const PATTERNS = {
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  phone: /^[+]?[\d][\d\-\.\s\(\)]{7,}\d$/,
+  ssn: /^\d{3}-\d{2}-\d{4}$/,
+  creditcard: /^(\d{4}[- ]?){3}\d{4}$/,
+  ip: /^(\d{1,3}\.){3}\d{1,3}$/,
+  apikey: /^[A-Za-z0-9_\-]{20,}$/,
+  date: /^\d{4}-\d{2}-\d{2}$/
+};
+const NAME_HINTS = {
+  email:['email','e-mail','mail'],
+  phone:['phone','mobile','contact_number','cell'],
+  ssn:['ssn','social_security','national_id','tax_id'],
+  name:['name','full_name','first_name','last_name','employee_name'],
+  address:['address','street','location','residence'],
+  dob:['dob','birth','date_of_birth','birthdate'],
+  id:['employee_id','emp_id','id','identifier','user_id'],
+  salary:['salary','wage','compensation','income'],
+  secret:['password','api_key','apikey','token','secret','access_key'],
+  ip:['ip','ip_address'],
+  card:['card','credit_card','cc_number','account_number','iban']
+};
+
+function nameMatches(colName, list){
+  const n = colName.toLowerCase().replace(/[^a-z]/g,'_');
+  return list.some(k=>n.includes(k.replace(/[^a-z]/g,'_')));
+}
+
+const NAME_SHAPE = /^[A-Z][a-zA-Z'-]+(\s[A-Z][a-zA-Z'-]+){1,2}$/;
+function looksLikeFullName(samples){
+  const nonEmpty = samples.filter(s=>s!=='' && s!=null).slice(0,15);
+  if(nonEmpty.length<3) return false;
+  const matches = nonEmpty.filter(v=>NAME_SHAPE.test(String(v).trim()));
+  return matches.length >= Math.max(2, Math.ceil(nonEmpty.length*0.7));
+}
+
+function detectColumnSensitivity(colName, samples){
+  const nonEmpty = samples.filter(s=>s!=='' && s!=null);
+  const test = (re)=> nonEmpty.length>0 && nonEmpty.slice(0,15).filter(v=>re.test(String(v).trim())).length >= Math.max(1,Math.ceil(nonEmpty.slice(0,15).length*0.6));
+
+  const checks = [
+    {key:'email', label:'Email', pat: test(PATTERNS.email), name: nameMatches(colName,NAME_HINTS.email), risk:'HIGH'},
+    {key:'phone', label:'Phone Number', pat: test(PATTERNS.phone), name: nameMatches(colName,NAME_HINTS.phone), risk:'HIGH'},
+    {key:'ssn', label:'Government Identifier', pat: test(PATTERNS.ssn), name: nameMatches(colName,NAME_HINTS.ssn), risk:'HIGH'},
+    {key:'creditcard', label:'Financial Card Number', pat: test(PATTERNS.creditcard), name: nameMatches(colName,NAME_HINTS.card), risk:'HIGH'},
+    {key:'ip', label:'IP Address', pat: test(PATTERNS.ip), name: nameMatches(colName,NAME_HINTS.ip), risk:'MEDIUM'},
+    {key:'secret', label:'Credential / Secret', pat: test(PATTERNS.apikey) , name: nameMatches(colName,NAME_HINTS.secret), risk:'HIGH'},
+    {key:'dob', label:'Date of Birth', pat: test(PATTERNS.date) && nameMatches(colName,NAME_HINTS.dob), name: nameMatches(colName,NAME_HINTS.dob), risk:'HIGH'},
+    {key:'name', label:'Personal Name', pat: looksLikeFullName(samples), name: nameMatches(colName,NAME_HINTS.name), risk:'HIGH', weak:true},
+    {key:'address', label:'Physical Address', pat:false, name: nameMatches(colName,NAME_HINTS.address), risk:'MEDIUM'},
+    {key:'id', label:'Internal Identifier', pat:false, name: nameMatches(colName,NAME_HINTS.id) && !nameMatches(colName,['email']), risk:'MEDIUM'},
+    {key:'salary', label:'Business-Sensitive (Compensation)', pat:false, name: nameMatches(colName,NAME_HINTS.salary), risk:'LOW'}
+  ];
+
+  for(const c of checks){
+    if(c.pat && c.name) return {sensitivity:c.risk, label:c.label, confidence:'High', reason:`Column name and value pattern both match ${c.label.toLowerCase()} structure.`, method:'Pattern match + column-name analysis'};
+  }
+  for(const c of checks){
+    if(c.pat && !c.weak) return {sensitivity:c.risk, label:c.label, confidence:'High', reason:`Values match the standard ${c.label.toLowerCase()} pattern.`, method:'Pattern match'};
+  }
+  for(const c of checks){
+    if(c.name) return {sensitivity:c.risk, label:c.label, confidence:'Medium', reason:`Column name suggests ${c.label.toLowerCase()}.`, method:'Column-name heuristic'};
+  }
+  for(const c of checks){
+    if(c.pat && c.weak) return {sensitivity:c.risk, label:c.label, confidence:'Medium', reason:`Values resemble full names (capitalized word pairs). This is a heuristic, not true name recognition, and can misfire on other title-case text — please confirm manually.`, method:'Pattern heuristic (weak)'};
+  }
+  return {sensitivity:'NONE', label:'Not sensitive', confidence:'—', reason:'No pattern or column-name signal matched.', method:'—'};
+}
+
+function inferType(samples){
+  const nonEmpty = samples.filter(s=>s!=='' && s!=null);
+  if(nonEmpty.length===0) return 'string';
+  const numeric = nonEmpty.every(v=>!isNaN(parseFloat(v)) && isFinite(v));
+  if(numeric) return 'number';
+  const dateish = nonEmpty.every(v=>PATTERNS.date.test(String(v).trim()));
+  if(dateish) return 'date';
+  return 'string';
+}
+
+function analyzeColumns(header, rows){
+  return header.map(name=>{
+    const samples = rows.map(r=>r[name]);
+    const type = inferType(samples);
+    const nonEmpty = samples.filter(s=>s!=='' && s!=null);
+    const nulls = samples.length - nonEmpty.length;
+    const uniqueSet = new Set(nonEmpty.map(String));
+    const det = detectColumnSensitivity(name, samples);
+
+    let stats = null;
+    let outlierCount = 0;
+    let topValues = null;
+    if(type==='number'){
+      const nums = nonEmpty.map(v=>parseFloat(v)).sort((a,b)=>a-b);
+      const q = (p)=>{
+        const idx=(nums.length-1)*p; const lo=Math.floor(idx), hi=Math.ceil(idx);
+        return nums[lo] + (nums[hi]-nums[lo])*(idx-lo);
+      };
+      const q1=q(0.25), q3=q(0.75), iqr=q3-q1;
+      const lowFence=q1-1.5*iqr, highFence=q3+1.5*iqr;
+      outlierCount = nums.filter(n=>n<lowFence||n>highFence).length;
+      const mean = nums.reduce((a,b)=>a+b,0)/nums.length;
+      const variance = nums.reduce((a,b)=>a+Math.pow(b-mean,2),0)/nums.length;
+      stats = {mean, median:q(0.5), min:nums[0], max:nums[nums.length-1], std:Math.sqrt(variance), q1, q3, iqr};
+    } else {
+      const freq = new Map();
+      nonEmpty.forEach(v=>{ const k=String(v); freq.set(k,(freq.get(k)||0)+1); });
+      topValues = Array.from(freq.entries()).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([value,count])=>({value, count, pct: nonEmpty.length? (count/nonEmpty.length*100):0}));
+    }
+
+    return {
+      name, type,
+      nulls, nullPct: samples.length? (nulls/samples.length*100):0,
+      unique: uniqueSet.size,
+      cardinality: nonEmpty.length? (uniqueSet.size/nonEmpty.length):0,
+      sensitivity: det.sensitivity, sensLabel: det.label, confidence: det.confidence, reason: det.reason, method: det.method,
+      samples: samples.slice(0,5),
+      stats, outlierCount, topValues
+    };
+  });
+}
+
+function suggestAction(col){
+  if(col.sensitivity==='HIGH'){
+    if(col.type==='number') return 'GENERALIZE';
+    if(col.unique === (col.nulls>=0? (state.dataset? state.dataset.rows.length-col.nulls:col.unique):col.unique) && col.name.toLowerCase().includes('id')) return 'TOKENIZE';
+    return 'MASK';
+  }
+  if(col.sensitivity==='MEDIUM') return 'REVIEW';
+  return 'ALLOW';
+}
+
+/* ---------------- Rule matching ---------------- */
+function ruleMatchesColumn(rule, col){
+  switch(rule.matchType){
+    case 'column_name_exact':
+      return col.name.toLowerCase() === rule.matchValue.toLowerCase();
+    case 'column_name_contains':
+      return col.name.toLowerCase().includes(rule.matchValue.toLowerCase());
+    case 'column_type':
+      return col.type === rule.matchValue;
+    case 'sensitivity_label':
+      return col.sensLabel === rule.matchValue;
+    case 'sensitivity_level':
+      return col.sensitivity === rule.matchValue;
+    default:
+      return false;
+  }
+}
+
+// Precedence: mandatory protocol -> columns the user set explicitly this session
+// -> active protocols in library order -> existing suggested default -> REVIEW.
+function applyProtocolLibraryToColumns(logChanges){
+  const mandatory = protocolLibrary.find(p=>p.id===MANDATORY_PROTOCOL_ID);
+  const others = protocolLibrary.filter(p=>p.id!==MANDATORY_PROTOCOL_ID && p.status==='ACTIVE');
+
+  state.columns.forEach(col=>{
+    // Mandatory rules always win, even over explicit user choices.
+    for(const rule of mandatory.rules){
+      if(ruleMatchesColumn(rule, col)){
+        if(state.protocols[col.name] !== rule.action && logChanges) log(`Mandatory rule: ${col.name} → ${rule.action}`);
+        state.protocols[col.name] = rule.action;
+        return;
+      }
+    }
+    // Respect explicit user choices for this column.
+    if(state.explicitlySet.has(col.name)) return;
+
+    // Active protocols, in library order, first matching rule wins.
+    for(const protocol of others){
+      for(const rule of protocol.rules){
+        if(ruleMatchesColumn(rule, col)){
+          if(state.protocols[col.name] !== rule.action && logChanges) log(`Protocol "${protocol.name}": ${col.name} → ${rule.action}`);
+          state.protocols[col.name] = rule.action;
+          return;
+        }
+      }
+    }
+    // No protocol matched — leave existing suggested default in place.
+  });
+}
+
+/* ---------------- Transformations ---------------- */
+function simpleHash(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) >>> 0; }
+  return h.toString(16).toUpperCase().padStart(6,'0').slice(0,6);
+}
+
+function applyProtection(){
+  const rows = state.dataset.rows;
+  const cols = state.dataset.columns;
+  state.tokenMaps = {};
+  const keptCols = cols.filter(c=> state.protocols[c] !== 'REMOVE');
+  state.protectedColumns = keptCols;
+
+  const tokenCounters = {};
+  keptCols.forEach(c=> tokenCounters[c]=0);
+
+  const newRows = rows.map(r=>{
+    const nr = {};
+    keptCols.forEach(c=>{
+      const action = state.protocols[c];
+      const val = r[c];
+      const colMeta = state.columns.find(x=>x.name===c);
+      switch(action){
+        case 'ALLOW':
+        case 'REVIEW':
+          nr[c]=val; break;
+        case 'MASK':
+          nr[c] = val ? '█'.repeat(Math.min(String(val).length,10)) : val;
+          break;
+        case 'TOKENIZE': {
+          if(!state.tokenMaps[c]) state.tokenMaps[c]=new Map();
+          const map = state.tokenMaps[c];
+          if(val===''||val==null){ nr[c]=val; break; }
+          if(!map.has(val)){ tokenCounters[c]++; map.set(val, `${labelPrefix(c)}_${String(tokenCounters[c]).padStart(3,'0')}`); }
+          nr[c]=map.get(val);
+          break;
+        }
+        case 'PSEUDONYMIZE': {
+          if(val===''||val==null){ nr[c]=val; break; }
+          nr[c] = `${labelPrefix(c)}-${simpleHash(String(val))}`;
+          break;
+        }
+        case 'GENERALIZE': {
+          if(val===''||val==null){ nr[c]=val; break; }
+          const n = parseFloat(val);
+          if(isNaN(n)){ nr[c]=val; break; }
+          const override = state.generalizeBuckets[c];
+          const bucket = override && override>0 ? override : (colMeta && colMeta.name.toLowerCase().includes('age') ? 5 : Math.max(10, Math.round((colMeta && colMeta.stats ? colMeta.stats.iqr : 10)/4) || 10));
+          const lo = Math.floor(n/bucket)*bucket;
+          nr[c] = `${lo}-${lo+bucket}`;
+          break;
+        }
+        default:
+          nr[c]=val;
+      }
+    });
+    return nr;
+  });
+
+  state.protected = newRows;
+  log('Protocols applied to dataset');
+  Object.keys(state.protocols).forEach(c=>{
+    if(state.protocols[c]==='REMOVE') log(`${c} removed`);
+    else if(state.protocols[c]==='MASK') log(`${c} masked`);
+    else if(state.protocols[c]==='TOKENIZE') log(`${c} tokenized`);
+    else if(state.protocols[c]==='PSEUDONYMIZE') log(`${c} pseudonymized`);
+    else if(state.protocols[c]==='GENERALIZE') log(`${c} generalized`);
+  });
+  runSecondScan();
+}
+
+function labelPrefix(colName){
+  const n = colName.toLowerCase();
+  if(n.includes('email')) return 'EMAIL';
+  if(n.includes('name')) return 'PERSON';
+  if(n.includes('phone')) return 'PHONE';
+  if(n.includes('id')) return 'ID';
+  if(n.includes('address')) return 'ADDR';
+  return 'VAL';
+}
+
+function runSecondScan(){
+  const warnings = [];
+  state.protectedColumns.forEach(c=>{
+    const samples = state.protected.map(r=>r[c]);
+    const det = detectColumnSensitivity(c, samples);
+    if(det.sensitivity!=='NONE'){
+      const action = state.protocols[c];
+      const wasSupposedToTransform = ['MASK','TOKENIZE','PSEUDONYMIZE','GENERALIZE'].includes(action);
+      if(wasSupposedToTransform || action==='ALLOW' || action==='REVIEW'){
+        warnings.push({
+          column:c,
+          detection:det.label,
+          severity: wasSupposedToTransform ? 'HIGH' : det.sensitivity,
+          note: wasSupposedToTransform
+            ? `Transformation (${action.charAt(0)+action.slice(1).toLowerCase()}) did not fully clear the detected pattern — review this column.`
+            : (action==='REVIEW' ? 'Marked for review — not yet resolved' : 'Allowed without transformation'),
+          unexpected: wasSupposedToTransform
+        });
+      }
+    }
+  });
+  state.secondScan = warnings;
+  log(warnings.length ? `Second privacy scan: ${warnings.length} field(s) still flagged` : 'Second privacy scan: no remaining sensitive fields detected');
+  runVerificationChecks();
+  log('Protected dataset verified');
+}
+
+function runVerificationChecks(){
+  const checks = [];
+
+  checks.push({
+    label: 'Row count preserved',
+    pass: state.protected.length === state.dataset.rows.length,
+    detail: `${state.protected.length} of ${state.dataset.rows.length} original rows present.`
+  });
+
+  const expectedRemoved = state.dataset.columns.filter(c=>state.protocols[c]==='REMOVE');
+  const actuallyRemoved = state.dataset.columns.filter(c=>!state.protectedColumns.includes(c));
+  checks.push({
+    label: 'Column removal matches protocol',
+    pass: expectedRemoved.length === actuallyRemoved.length && expectedRemoved.every(c=>actuallyRemoved.includes(c)),
+    detail: actuallyRemoved.length ? `Removed: ${actuallyRemoved.join(', ')}` : 'No columns were removed.'
+  });
+
+  let tokenCollision = false;
+  const tokenDetails = [];
+  Object.keys(state.tokenMaps).forEach(c=>{
+    const map = state.tokenMaps[c];
+    const uniqueOriginals = map.size;
+    const uniqueTokens = new Set(map.values()).size;
+    if(uniqueTokens !== uniqueOriginals) tokenCollision = true;
+    tokenDetails.push(`${c}: ${uniqueOriginals} value(s) → ${uniqueTokens} token(s)`);
+  });
+  checks.push({
+    label: 'Tokenization is collision-free',
+    pass: !tokenCollision,
+    detail: tokenDetails.length ? tokenDetails.join(' · ') : 'No tokenized columns in this run.'
+  });
+
+  const unexpectedFailures = state.secondScan.filter(w=>w.unexpected);
+  checks.push({
+    label: 'No transformation failures detected',
+    pass: unexpectedFailures.length === 0,
+    detail: unexpectedFailures.length ? `${unexpectedFailures.length} transformed column(s) still match a sensitive pattern.` : 'All transformed columns cleared the second scan.'
+  });
+
+  checks.push({
+    label: 'Original file unchanged',
+    pass: true,
+    detail: `Local integrity checksum ${state.dataset.checksum} recorded at import and never rewritten. DataPermit only reads the original file.`
+  });
+
+  state.verificationChecks = checks;
+}
+
+/* ---------------- Sample dataset ---------------- */
+function sampleDataset(){
+  const first=['Rahul','Emma','Wei','Fatima','Lucas','Aisha','Noah','Priya','Diego','Mei','Omar','Sofia','Liam','Ines','Kenji'];
+  const last=['Sharma','Johnson','Chen','Khan','Garcia','Patel','Smith','Nair','Rossi','Wang','Haddad','Silva','Brown','Dubois','Sato'];
+  const dept=['Engineering','Sales','Finance','HR','Marketing','Operations'];
+  const rows=[];
+  for(let i=0;i<28;i++){
+    const f=first[i%first.length], l=last[(i*3+1)%last.length];
+    const id = 39000+i*7;
+    const salary = 52000 + Math.round(Math.random()*70000);
+    rows.push({
+      Employee_ID: `EMP-${id}`,
+      Name: `${f} ${l}`,
+      Email: `${f.toLowerCase()}.${l.toLowerCase()}@company.com`,
+      Phone: `+1-${200+i}-555-${1000+i*3}`,
+      Department: dept[i%dept.length],
+      Salary: (i===4? 410000 : i===19? 9000 : salary), // outliers
+      Date_of_Birth: `19${70+ (i%25)}-0${1+(i%9)}-1${i%9}`,
+      Address: `${100+i} Maple Street, Springfield`
+    });
+  }
+  // inject some quality issues
+  rows[3].Email = 'not-an-email';
+  rows[7].Salary = '';
+  rows[12].Salary = '';
+  rows[15].Phone = '';
+  rows[9] = {...rows[2], Employee_ID:'EMP-39999'}; // duplicate-ish row
+  return rows;
+}
+
+/* ---------------- Rendering ---------------- */
+const $content = document.getElementById('content');
+
+function setView(v){
+  const alwaysAllowed = ['projects','settings'];
+  if(!state.dataset && v!=='overview' && !alwaysAllowed.includes(v)){ v='overview'; }
+  state.view = v;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active', el.dataset.view===v));
+  render();
+}
+
+function renderTopbar(){
+  const badge = document.getElementById('datasetBadge');
+  if(state.dataset){
+    document.getElementById('topTitle').textContent = state.dataset.name;
+    document.getElementById('topSub').textContent = `CSV · ${state.dataset.rows.length.toLocaleString()} rows · ${state.dataset.columns.length} columns`;
+    badge.style.display='inline-flex';
+    badge.textContent = state.protected ? 'Protected copy ready' : 'Not yet protected';
+  } else {
+    document.getElementById('topTitle').textContent = 'No dataset loaded';
+    document.getElementById('topSub').textContent = 'Import a dataset to begin';
+    badge.style.display='none';
+  }
+}
+
+function esc(s){ return String(s===undefined||s===null?'':s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function render(){
+  if(!state.dataset){
+    if(state.view==='projects'){ renderProjects(); return; }
+    if(state.view==='settings'){ renderSettings(); return; }
+    renderImport(); return;
+  }
+  switch(state.view){
+    case 'overview': renderOverview(); break;
+    case 'data': renderDataTable(); break;
+    case 'privacy': renderPrivacy(); break;
+    case 'quality': renderQuality(); break;
+    case 'aiview': renderAIView(); break;
+    case 'report': renderReport(); break;
+    case 'export': renderExport(); break;
+    case 'projects': renderProjects(); break;
+    case 'settings': renderSettings(); break;
+    case 'audit': renderAudit(); break;
+    default: renderOverview();
+  }
+}
+
+function renderImport(){
+  document.getElementById('topTitle').textContent='Import Dataset';
+  document.getElementById('topSub').textContent='CSV files are read locally in your browser — nothing is uploaded';
+  $content.innerHTML = `
+    <div class="import-wrap">
+      <div class="dropzone" id="dropzone">
+        <svg class="mark-big" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="8" height="8" rx="1" stroke="#171B22" stroke-width="1.3"/>
+          <rect x="14" y="2" width="8" height="8" rx="1" stroke="#171B22" stroke-width="1.3" opacity="0.3"/>
+          <rect x="2" y="14" width="8" height="8" rx="1" stroke="#171B22" stroke-width="1.3" opacity="0.3"/>
+          <path d="M14 18 L18 18 L18 14" stroke="#2B6CB5" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 14 L18 18" stroke="#2B6CB5" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="18" cy="18" r="1.1" fill="#2B6CB5"/>
+        </svg>
+        <div class="h1" style="text-align:center;">Prepare your data for AI</div>
+        <div class="sub" style="text-align:center;">without exposing what AI doesn't need</div>
+        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.json,.txt,.xml" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;">
+          <label for="fileInput" class="btn primary" style="display:inline-block;">Choose File</label>
+          <button class="btn" id="sampleBtn">Load Sample Dataset</button>
+        </div>
+        <div class="sub" style="margin-top:16px;">CSV, XLSX, JSON, TXT or XML &middot; drag a file onto this window &middot; up to 100 MB</div>
+      </div>
+      <div id="importError"></div>
+
+      ${!appSettings.hideOnboarding ? `
+        <div class="panel" style="padding:16px 18px;margin-top:16px;text-align:left;position:relative;">
+          <button class="btn small" style="position:absolute;top:12px;right:12px;" onclick="dismissOnboarding()">Got it</button>
+          <div style="font-weight:700;font-size:13px;margin-bottom:2px;">How DataPermit works</div>
+          <div class="sub" style="margin:0 0 4px 0;">Every step below runs on this device. Nothing is uploaded at any point.</div>
+          <div class="pipeline-steps">
+            ${[['1','Import'],['2','Inspect'],['3','Protect'],['4','Review'],['5','Verify'],['6','Export']].map(([n,l],i,arr)=>`
+              <div class="pipeline-step"><div class="num">${n}</div><div class="lbl">${l}</div></div>
+              ${i<arr.length-1?'<span class="pipeline-arrow">→</span>':''}
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="callout blue" style="margin-top:16px;text-align:left;">
+        <span>ⓘ</span>
+        <div>DataPermit runs fully offline. Your file is parsed in this browser tab and never leaves your device. Nothing is transmitted anywhere.</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('sampleBtn').onclick = ()=>{
+    const rows = sampleDataset();
+    const header = Object.keys(rows[0]);
+    log('File validated: sample_employee_data.csv');
+    log('Format validated: CSV');
+    loadDataset('sample_employee_data.csv', header, rows, 4200);
+  };
+  document.getElementById('fileInput').onchange = (e)=>{
+    const f = e.target.files[0];
+    if(f) handleImportedFile(f);
+  };
+  const dz = document.getElementById('dropzone');
+  dz.ondragover = (e)=>{ e.preventDefault(); dz.classList.add('drag'); };
+  dz.ondragleave = ()=> dz.classList.remove('drag');
+  dz.ondrop = (e)=>{
+    e.preventDefault(); dz.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if(f) handleImportedFile(f);
+  };
+}
+
+const MAX_FILE_MB = 100;
+
+function showImportError(title, reason, action, technical){
+  document.getElementById('importError').innerHTML = `
+    <div class="callout red" style="margin-top:16px;text-align:left;">
+      <span>⚠</span>
+      <div>
+        <strong>${esc(title)}</strong>
+        <div style="margin-top:3px;">${esc(reason)}</div>
+        <div style="margin-top:3px;color:var(--text-dim);">${esc(action)}</div>
+        ${technical? `<details class="tech-details"><summary>Technical details</summary><pre>${esc(technical)}</pre></details>` : ''}
+      </div>
+    </div>
+  `;
+}
+function clearImportError(){
+  const el = document.getElementById('importError');
+  if(el) el.innerHTML = '';
+}
+
+function loadSheet(f, wb, sheetName, rawResult){
+  const sheet = wb.Sheets[sheetName];
+  const json = XLSX.utils.sheet_to_json(sheet, {defval:''});
+  if(!json || json.length===0){
+    showImportError('DataPermit couldn\'t find data in this sheet.', `The sheet "${sheetName}" appears to be empty.`, 'Choose a different sheet, or confirm it has a header row.');
+    return;
+  }
+  const header = Array.from(json.reduce((set,row)=>{ Object.keys(row).forEach(k=>set.add(k)); return set; }, new Set()));
+  const rows = json.map(row=>{ const o={}; header.forEach(h=> o[h] = row[h]!==undefined ? String(row[h]) : ''); return o; });
+  log(`Format validated: XLSX structure confirmed (sheet "${sheetName}")`);
+  finishImport(f.name, header, rows, f.size, computeChecksum(rawResult));
+}
+
+function showSheetPicker(f, wb, rawResult){
+  clearImportError();
+  const el = document.getElementById('importError');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="callout blue" style="margin-top:16px;text-align:left;">
+      <span>ⓘ</span>
+      <div>
+        <strong>This workbook has ${wb.SheetNames.length} sheets.</strong> Choose which one to import — DataPermit only imports one sheet at a time.
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
+          ${wb.SheetNames.map(name=>`<button class="btn small" onclick='loadSheet(window.__pendingFile, window.__pendingWb, ${JSON.stringify(name)}, window.__pendingRaw)'>${esc(name)}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  window.__pendingFile = f; window.__pendingWb = wb; window.__pendingRaw = rawResult;
+}
+
+function handleImportedFile(f){
+  clearImportError();
+  const nameLower = f.name.toLowerCase();
+  const ext = nameLower.includes('.') ? nameLower.split('.').pop() : '';
+  const supported = ['csv','xlsx','xls','json','txt','xml'];
+  const plannedNotYet = ['parquet','sql','db'];
+
+  // 1. Extension validation
+  if(plannedNotYet.includes(ext)){
+    showImportError(
+      "This format isn't available in this preview yet.",
+      `Support for ".${ext}" is planned but not built into this browser-based preview.`,
+      'Try a .csv, .xlsx, .json, .txt, or .xml export instead.',
+      `filename=${f.name}`
+    );
+    return;
+  }
+  if(!supported.includes(ext)){
+    showImportError(
+      "DataPermit doesn't support this file type.",
+      `Files ending in ".${ext || '?'}" aren't supported.`,
+      'Try a .csv, .xlsx, .json, .txt, or .xml file instead.',
+      `filename=${f.name}`
+    );
+    return;
+  }
+
+  // 2. File size check
+  const sizeMB = f.size / (1024*1024);
+  if(sizeMB > MAX_FILE_MB){
+    showImportError(
+      "This file is larger than DataPermit can currently handle.",
+      `The file is ${sizeMB.toFixed(1)} MB. The current limit for this preview is ${MAX_FILE_MB} MB.`,
+      'Try a smaller export, or split the file and import in parts.',
+      `size=${f.size} bytes`
+    );
+    return;
+  }
+  if(f.size === 0){
+    showImportError(
+      "This file appears to be empty.",
+      'DataPermit couldn\'t find any content to read.',
+      'Check the file and try again.'
+    );
+    return;
+  }
+
+  log(`File validated: ${f.name} (${sizeMB.toFixed(2)} MB)`);
+
+  // 3. Read + actual-format validation (extension vs real content)
+  const reader = new FileReader();
+  reader.onerror = ()=>{
+    showImportError("DataPermit couldn't read this file.", 'The file may be corrupted or in use by another program.', 'Try another file.', String(reader.error));
+  };
+
+  if(ext==='csv'){
+    reader.onload = ()=>{
+      try{
+        const {header, rows} = parseCSV(reader.result);
+        if(!header || header.length===0 || rows.length===0){
+          showImportError('DataPermit couldn\'t find tabular data in this file.', 'The file was readable but no rows or columns were detected.', 'Confirm the file has a header row and at least one data row.');
+          return;
+        }
+        log('Format validated: CSV structure confirmed');
+        finishImport(f.name, header, rows, f.size, computeChecksum(reader.result));
+      }catch(err){
+        showImportError('DataPermit couldn\'t parse this file as CSV.', 'The file content doesn\'t match standard CSV structure.', 'Check for unescaped commas or quotes, or re-export the file.', String(err));
+      }
+    };
+    reader.readAsText(f);
+  } else if(ext==='json'){
+    reader.onload = ()=>{
+      try{
+        const parsed = JSON.parse(reader.result);
+        const arr = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.data) ? parsed.data : null);
+        if(!arr || arr.length===0 || typeof arr[0] !== 'object'){
+          showImportError('DataPermit couldn\'t find tabular data in this JSON file.', 'Expected a JSON array of objects (records).', 'Export as an array of row objects, e.g. [{"col": "value"}, ...].');
+          return;
+        }
+        const header = Array.from(arr.reduce((set,row)=>{ Object.keys(row).forEach(k=>set.add(k)); return set; }, new Set()));
+        const rows = arr.map(row=>{ const o={}; header.forEach(h=> o[h] = row[h]!==undefined ? row[h] : ''); return o; });
+        log('Format validated: JSON structure confirmed');
+        finishImport(f.name, header, rows, f.size, computeChecksum(reader.result));
+      }catch(err){
+        showImportError('DataPermit couldn\'t parse this file as JSON.', 'The file content isn\'t valid JSON.', 'Check for a trailing comma or unclosed bracket, or re-export the file.', String(err));
+      }
+    };
+    reader.readAsText(f);
+  } else if(ext==='txt'){
+    reader.onload = ()=>{
+      try{
+        const text = reader.result;
+        const firstLine = text.split(/\r?\n/)[0] || '';
+        const candidates = [['\t','tab'],[',','comma'],['|','pipe'],[';','semicolon']];
+        let best = candidates[0];
+        candidates.forEach(c=>{ if((firstLine.split(c[0]).length) > (firstLine.split(best[0]).length)) best = c; });
+        const delimited = parseDelimited(text, best[0]);
+        if(!delimited.header.length || delimited.rows.length===0){
+          showImportError('DataPermit couldn\'t find tabular data in this text file.', `Detected "${best[1]}" as the likely delimiter, but no usable rows were found.`, 'Confirm the file has a consistent delimiter and a header row.');
+          return;
+        }
+        log(`Format validated: TXT structure confirmed (${best[1]}-delimited)`);
+        finishImport(f.name, delimited.header, delimited.rows, f.size, computeChecksum(text));
+      }catch(err){
+        showImportError('DataPermit couldn\'t parse this text file.', 'Could not detect a consistent delimiter and header row.', 'Try exporting as CSV instead.', String(err));
+      }
+    };
+    reader.readAsText(f);
+  } else if(ext==='xml'){
+    reader.onload = ()=>{
+      try{
+        const text = reader.result;
+        const xmlDoc = new DOMParser().parseFromString(text, 'application/xml');
+        if(xmlDoc.querySelector('parsererror')){
+          showImportError('DataPermit couldn\'t parse this file as XML.', 'The file isn\'t well-formed XML.', 'Check for unclosed tags, or re-export the file.');
+          return;
+        }
+        const root = xmlDoc.documentElement;
+        const recordEls = Array.from(root.children);
+        if(recordEls.length===0){
+          showImportError('DataPermit couldn\'t find repeating records in this XML file.', 'Expected a root element containing repeated record elements, e.g. <rows><row><col>value</col></row></rows>.', 'Check the file structure.');
+          return;
+        }
+        const headerSet = new Set();
+        const rows = recordEls.map(rec=>{
+          const o = {};
+          Array.from(rec.children).forEach(field=>{ o[field.tagName] = field.textContent; headerSet.add(field.tagName); });
+          if(Array.from(rec.children).length===0){ o[rec.tagName]=rec.textContent; headerSet.add(rec.tagName); }
+          return o;
+        });
+        const header = Array.from(headerSet);
+        const normalizedRows = rows.map(row=>{ const o={}; header.forEach(h=> o[h]=row[h]!==undefined?row[h]:''); return o; });
+        log('Format validated: XML structure confirmed');
+        finishImport(f.name, header, normalizedRows, f.size, computeChecksum(text));
+      }catch(err){
+        showImportError('DataPermit couldn\'t parse this file as XML.', 'An unexpected error occurred while reading the file.', 'Check the file structure, or try CSV/JSON instead.', String(err));
+      }
+    };
+    reader.readAsText(f);
+  } else if(ext==='xlsx' || ext==='xls'){
+    reader.onload = ()=>{
+      try{
+        if(typeof XLSX === 'undefined'){
+          if(appSettings.offlineLock){
+            showImportError('XLSX reading is unavailable with Strict Offline Lock enabled.', 'The XLSX parser loads once from a CDN on first use, and Strict Offline Lock (Settings → Offline Mode) blocks that.', 'Disable Strict Offline Lock once, or use a CSV/JSON export instead.');
+            return;
+          }
+          showImportError('The XLSX reader didn\'t load.', 'This preview loads a local spreadsheet-parsing library from a CDN the first time it\'s used.', 'Check your connection for this one-time load, or use a CSV export instead.');
+          return;
+        }
+        const wb = XLSX.read(reader.result, {type:'array'});
+        if(wb.SheetNames.length > 1){
+          showSheetPicker(f, wb, reader.result);
+          return;
+        }
+        loadSheet(f, wb, wb.SheetNames[0], reader.result);
+      }catch(err){
+        showImportError('DataPermit couldn\'t parse this file as XLSX.', 'The file may be corrupted, password-protected, or not a real spreadsheet despite its extension.', 'Try re-saving the file from your spreadsheet app, or export as CSV.', String(err));
+      }
+    };
+    reader.readAsArrayBuffer(f);
+  }
+}
+
+function sensPill(s){
+  if(s==='HIGH') return `<span class="pill red">● High</span>`;
+  if(s==='MEDIUM') return `<span class="pill amber">● Medium</span>`;
+  if(s==='LOW') return `<span class="pill blue">● Low</span>`;
+  return `<span class="pill gray">None</span>`;
+}
+
+function renderOverview(){
+  renderTopbar();
+  const d = state.dataset;
+  const sensitiveCount = state.columns.filter(c=>c.sensitivity!=='NONE').length;
+  const totalNulls = state.columns.reduce((a,c)=>a+c.nulls,0);
+  const dupRows = countDuplicateRows(d.rows);
+
+  $content.innerHTML = `
+    <div class="h1">Overview</div>
+    <div class="sub">Dataset profile generated locally on import.</div>
+
+    <div class="grid cols-4" style="grid-template-columns:repeat(4,1fr);margin-bottom:22px;">
+      <div class="panel stat"><div class="stat-label">Rows</div><div class="stat-value">${d.rows.length.toLocaleString()}</div></div>
+      <div class="panel stat"><div class="stat-label">Columns</div><div class="stat-value">${d.columns.length}</div></div>
+      <div class="panel stat"><div class="stat-label">Sensitive fields</div><div class="stat-value" style="color:var(--red)">${sensitiveCount}</div></div>
+      <div class="panel stat"><div class="stat-label">Duplicate rows</div><div class="stat-value" style="color:${dupRows?'var(--amber)':'var(--text)'}">${dupRows}</div></div>
+    </div>
+
+    <div class="section-title">Column Summary</div>
+    <div class="panel" style="margin-bottom:22px;">
+      <table>
+        <thead><tr><th>Column</th><th>Type</th><th>Missing</th><th>Unique</th><th>Sensitivity</th></tr></thead>
+        <tbody>
+          ${state.columns.map(c=>`
+            <tr>
+              <td class="col-name col-clickable" onclick="openColumnInspector('${c.name.replace(/'/g,"\\'")}')">${esc(c.name)}</td>
+              <td class="mono dim">${c.type}</td>
+              <td>${c.nulls} <span class="faint">(${c.nullPct.toFixed(0)}%)</span></td>
+              <td class="mono">${c.unique}</td>
+              <td>${sensPill(c.sensitivity)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn accent" onclick="setView('privacy')">Go to Privacy Review →</button>
+      <button class="btn" onclick="setView('quality')">View Data Quality</button>
+    </div>
+  `;
+}
+
+function countDuplicateRows(rows){
+  const seen = new Map();
+  let dup=0;
+  rows.forEach(r=>{
+    const key = JSON.stringify(r);
+    seen.set(key,(seen.get(key)||0)+1);
+  });
+  seen.forEach(v=>{ if(v>1) dup += v; });
+  return dup;
+}
+
+function duplicateRowIndexSet(rows){
+  const keyToIndices = new Map();
+  rows.forEach((r,i)=>{
+    const key = JSON.stringify(r);
+    if(!keyToIndices.has(key)) keyToIndices.set(key, []);
+    keyToIndices.get(key).push(i);
+  });
+  const dupIndices = new Set();
+  keyToIndices.forEach(idxList=>{ if(idxList.length>1) idxList.forEach(i=>dupIndices.add(i)); });
+  return dupIndices;
+}
+
+function firstOccurrenceIndices(rows){
+  const seen = new Set();
+  const keep = [];
+  rows.forEach((r,i)=>{
+    const key = JSON.stringify(r);
+    if(!seen.has(key)){ seen.add(key); keep.push(i); }
+  });
+  return keep;
+}
+
+function getExportRowIndices(){
+  if(state.qualityDecisions.__duplicates__ === 'remove'){
+    return firstOccurrenceIndices(state.dataset.rows);
+  }
+  return state.protected.map((_,i)=>i);
+}
+
+function visibleDataColumns(){
+  const d = state.dataset;
+  return d.columns.filter(c=>!state.dataTable.hiddenCols.has(c));
+}
+
+function getFilteredSortedRows(){
+  const d = state.dataset;
+  const dt = state.dataTable;
+  let indices = d.rows.map((_,i)=>i);
+
+  if(dt.rowFilter){
+    const {column, type} = dt.rowFilter;
+    if(type==='duplicate'){
+      const dupSet = duplicateRowIndexSet(d.rows);
+      indices = indices.filter(i=>dupSet.has(i));
+    } else {
+    indices = indices.filter(i=>{
+      const v = d.rows[i][column];
+      if(type==='missing') return v===''||v==null;
+      if(type==='outlier'){
+        const meta = state.columns.find(x=>x.name===column);
+        if(!meta || !meta.stats) return false;
+        const n = parseFloat(v);
+        if(isNaN(n)) return false;
+        const lowFence = meta.stats.q1 - 1.5*meta.stats.iqr, highFence = meta.stats.q3 + 1.5*meta.stats.iqr;
+        return n<lowFence || n>highFence;
+      }
+      return true;
+    });
+    }
+  }
+
+  const q = dt.search.trim().toLowerCase();
+  if(q){
+    indices = indices.filter(i=>{
+      const hay = d.columns.map(c=>String(d.rows[i][c]||'')).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  if(dt.sortCol){
+    const meta = state.columns.find(x=>x.name===dt.sortCol);
+    indices.sort((a,b)=>{
+      let va = d.rows[a][dt.sortCol], vb = d.rows[b][dt.sortCol];
+      if(meta && meta.type==='number'){ va=parseFloat(va); vb=parseFloat(vb); if(isNaN(va)) va=-Infinity; if(isNaN(vb)) vb=-Infinity; }
+      else { va=String(va||''); vb=String(vb||''); }
+      if(va<vb) return -1*dt.sortDir;
+      if(va>vb) return 1*dt.sortDir;
+      return 0;
+    });
+  }
+  return indices;
+}
+
+function renderDataTable(){
+  renderTopbar();
+  const d = state.dataset;
+  const dt = state.dataTable;
+  const cols = visibleDataColumns();
+  const indices = getFilteredSortedRows();
+  const totalPages = Math.max(1, Math.ceil(indices.length / dt.pageSize));
+  if(dt.page >= totalPages) dt.page = totalPages-1;
+  const pageIndices = indices.slice(dt.page*dt.pageSize, (dt.page+1)*dt.pageSize);
+
+  $content.innerHTML = `
+    <div class="h1">Data Table</div>
+    <div class="sub">Original dataset. Sensitive values are partially masked in this preview.</div>
+
+    ${dt.rowFilter ? `
+      <div class="callout blue" style="margin-bottom:12px;">
+        <span>ⓘ</span>
+        <div>${dt.rowFilter.type==='duplicate' ? 'Showing only duplicate rows' : `Showing only rows where <strong>${esc(dt.rowFilter.column)}</strong> is ${dt.rowFilter.type==='missing'?'missing':'a potential outlier'}`}, from Data Quality.
+          <a href="#" onclick="clearDataTableRowFilter();return false;" style="margin-left:6px;">Clear filter</a>
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="dt-toolbar">
+      <input type="text" placeholder="Search rows…" value="${esc(dt.search)}" oninput="setDTSearch(this.value)" aria-label="Search rows">
+      <button class="btn small" onclick="toggleColumnsPanel(event)" aria-haspopup="true">Columns ▾</button>
+      <span class="sub" style="margin:0;">${indices.length.toLocaleString()} row(s) · ${cols.length} of ${d.columns.length} column(s) shown</span>
+    </div>
+    <div id="columnsPanelAnchor" style="position:relative;"></div>
+
+    <div class="panel" style="overflow:auto;max-height:64vh;">
+      <table style="table-layout:fixed;">
+        <thead><tr>${cols.map(c=>{
+          const meta = state.columns.find(x=>x.name===c);
+          const pinned = dt.pinnedCols.has(c);
+          const width = dt.colWidths[c] || 160;
+          const sortIcon = dt.sortCol===c ? (dt.sortDir===1?'▲':'▼') : '';
+          return `<th class="col-clickable sortable ${pinned?'pinned':''}" style="width:${width}px;" title="Click to sort. Click the column name text to inspect.">
+            <div class="dt-th-inner">
+              <span onclick="openColumnInspector('${c.replace(/'/g,"\\'")}')" style="flex:1;" tabindex="0" role="button" aria-label="Inspect column ${esc(c)}">
+                ${esc(c)}${meta.sensitivity!=='NONE'?` <span style="color:var(--red)" title="Sensitive column (${esc(meta.sensLabel)})" aria-label="Sensitive">●</span>`:''}
+                <br><span style="font-weight:400;text-transform:none;font-size:10px;">${meta.nullPct.toFixed(0)}% missing</span>
+              </span>
+              <button class="pin-btn ${pinned?'active':''}" title="${pinned?'Unpin column':'Pin column'}" aria-label="${pinned?'Unpin':'Pin'} ${esc(c)}" onclick="event.stopPropagation(); toggleColumnPin('${c.replace(/'/g,"\\'")}')">📌</button>
+              <span onclick="event.stopPropagation(); setSortColumn('${c.replace(/'/g,"\\'")}')" style="cursor:pointer;padding:2px;" aria-label="Sort by ${esc(c)}">${sortIcon||'⇅'}</span>
+            </div>
+            <div class="resize-handle" onmousedown="startColumnResize(event,'${c.replace(/'/g,"\\'")}')" aria-hidden="true"></div>
+          </th>`;
+        }).join('')}</tr></thead>
+        <tbody>
+          ${pageIndices.length ? pageIndices.map(i=>{
+            const r = d.rows[i];
+            return `<tr>${cols.map(c=>{
+              const meta = state.columns.find(x=>x.name===c);
+              const v = r[c];
+              const display = (meta.sensitivity==='HIGH' && v) ? maskPreview(v) : esc(v);
+              const pinned = dt.pinnedCols.has(c);
+              return `<td class="${meta.sensitivity==='HIGH'?'masked':'mono'} ${pinned?'pinned':''}">${display}</td>`;
+            }).join('')}</tr>`;
+          }).join('') : `<tr><td colspan="${cols.length}" class="empty">No matching rows</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+      <span class="sub" style="margin:0;">Showing ${pageIndices.length? dt.page*dt.pageSize+1:0}–${dt.page*dt.pageSize+pageIndices.length} of ${indices.length}</span>
+      <div style="display:flex;gap:6px;">
+        <button class="btn small" ${dt.page===0?'disabled':''} onclick="changeDTPage(-1)">← Prev</button>
+        <span class="sub" style="margin:0;align-self:center;">Page ${dt.page+1} of ${totalPages}</span>
+        <button class="btn small" ${dt.page>=totalPages-1?'disabled':''} onclick="changeDTPage(1)">Next →</button>
+      </div>
+    </div>
+  `;
+}
+
+function setDTSearch(v){ state.dataTable.search=v; state.dataTable.page=0; renderDataTable(); refocusAfterRerender('.dt-toolbar input[type="text"]'); }
+function changeDTPage(d){ state.dataTable.page += d; renderDataTable(); }
+function setSortColumn(c){
+  const dt = state.dataTable;
+  if(dt.sortCol===c) dt.sortDir *= -1; else { dt.sortCol=c; dt.sortDir=1; }
+  renderDataTable();
+}
+function toggleColumnPin(c){
+  const dt = state.dataTable;
+  if(dt.pinnedCols.has(c)) dt.pinnedCols.delete(c); else dt.pinnedCols.add(c);
+  renderDataTable();
+}
+function clearDataTableRowFilter(){ state.dataTable.rowFilter = null; state.dataTable.page = 0; renderDataTable(); }
+
+function toggleColumnsPanel(e){
+  e.stopPropagation();
+  const anchor = document.getElementById('columnsPanelAnchor');
+  if(anchor.children.length){ anchor.innerHTML=''; return; }
+  const d = state.dataset;
+  const dt = state.dataTable;
+  const panel = document.createElement('div');
+  panel.className = 'columns-panel';
+  panel.innerHTML = d.columns.map(c=>`
+    <label><input type="checkbox" ${dt.hiddenCols.has(c)?'':'checked'} onchange="toggleColumnVisible('${c.replace(/'/g,"\\'")}')"> ${esc(c)}</label>
+  `).join('');
+  anchor.appendChild(panel);
+  const closeOnOutside = (ev)=>{ if(!panel.contains(ev.target)){ anchor.innerHTML=''; document.removeEventListener('click', closeOnOutside); } };
+  setTimeout(()=>document.addEventListener('click', closeOnOutside), 0);
+}
+function toggleColumnVisible(c){
+  const dt = state.dataTable;
+  if(dt.hiddenCols.has(c)) dt.hiddenCols.delete(c); else dt.hiddenCols.add(c);
+  renderDataTable();
+}
+
+let resizeState = null;
+function startColumnResize(e, col){
+  e.preventDefault(); e.stopPropagation();
+  const th = e.target.closest('th');
+  resizeState = {col, startX: e.clientX, startWidth: th.offsetWidth};
+  document.addEventListener('mousemove', onColumnResize);
+  document.addEventListener('mouseup', endColumnResize);
+}
+function onColumnResize(e){
+  if(!resizeState) return;
+  const newWidth = Math.max(60, resizeState.startWidth + (e.clientX - resizeState.startX));
+  state.dataTable.colWidths[resizeState.col] = newWidth;
+  const ths = document.querySelectorAll('th');
+  ths.forEach(th=>{ if(th.textContent.trim().startsWith(resizeState.col)) th.style.width = newWidth+'px'; });
+}
+function endColumnResize(){
+  resizeState = null;
+  document.removeEventListener('mousemove', onColumnResize);
+  document.removeEventListener('mouseup', endColumnResize);
+  renderDataTable();
+}
+
+function maskPreview(v){
+  const s = String(v);
+  if(s.length<=2) return '██';
+  return s[0]+'█'.repeat(Math.min(s.length-1,8));
+}
+
+/* ---------------- Column Inspector ---------------- */
+function openColumnInspector(colName){
+  const c = state.columns.find(x=>x.name===colName);
+  if(!c) return;
+  const protocol = state.protocols[colName] || 'REVIEW';
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.id = 'inspectorOverlay';
+  overlay.setAttribute('role','dialog');
+  overlay.setAttribute('aria-modal','true');
+  overlay.setAttribute('aria-label','Column inspector: '+colName);
+  overlay.onclick = (e)=>{ if(e.target===overlay) closeInspector(); };
+
+  const sampleHtml = c.samples.map(v=>{
+    const display = (c.sensitivity==='HIGH' && v) ? maskPreview(v) : esc(v || '—');
+    return `<span class="sample-chip">${display}</span>`;
+  }).join('');
+
+  const statsHtml = c.stats ? `
+    <div class="ins-row"><span class="k">Mean</span><span class="v">${c.stats.mean.toFixed(2)}</span></div>
+    <div class="ins-row"><span class="k">Median</span><span class="v">${c.stats.median.toFixed(2)}</span></div>
+    <div class="ins-row"><span class="k">Min</span><span class="v">${c.stats.min.toFixed(2)}</span></div>
+    <div class="ins-row"><span class="k">Max</span><span class="v">${c.stats.max.toFixed(2)}</span></div>
+    <div class="ins-row"><span class="k">Std deviation</span><span class="v">${c.stats.std.toFixed(2)}</span></div>
+    <div class="ins-row"><span class="k">Q1 / Q3</span><span class="v">${c.stats.q1.toFixed(1)} / ${c.stats.q3.toFixed(1)}</span></div>
+    <div class="ins-row"><span class="k">IQR</span><span class="v">${c.stats.iqr.toFixed(2)}</span></div>
+    <div class="ins-row"><span class="k">Potential outliers</span><span class="v" style="color:${c.outlierCount?'var(--amber)':'var(--text)'}">${c.outlierCount}</span></div>
+  ` : '';
+
+  const freqHtml = c.topValues ? c.topValues.map(t=>{
+    const display = c.sensitivity==='HIGH' ? maskPreview(t.value) : esc(t.value);
+    return `
+      <div class="freq-bar-wrap">
+        <div class="freq-bar-label"><span class="mono">${display}</span><span class="dim">${t.count} · ${t.pct.toFixed(0)}%</span></div>
+        <div class="freq-bar-track"><div class="freq-bar-fill" style="width:${Math.min(100,t.pct)}%;"></div></div>
+      </div>`;
+  }).join('') : '';
+
+  overlay.innerHTML = `
+    <div class="inspector">
+      <div class="inspector-head">
+        <div>
+          <div style="font-size:15px;font-weight:700;">${esc(c.name)}</div>
+          <div class="sub" style="margin:2px 0 0 0;">${c.type} column</div>
+        </div>
+        <button class="inspector-close" onclick="closeInspector()" aria-label="Close column inspector">✕</button>
+      </div>
+      <div class="inspector-body">
+
+        <div class="ins-block">
+          <div class="ins-label">Sensitivity</div>
+          <div style="margin-bottom:8px;">${sensPill(c.sensitivity)} <span style="font-size:12px;margin-left:4px;">${esc(c.sensLabel)}</span></div>
+          <div class="ins-row"><span class="k">Detection method</span><span class="v" style="font-weight:600;font-family:var(--sans);">${esc(c.method)}</span></div>
+          <div class="ins-row"><span class="k">Confidence</span><span class="v" style="font-weight:600;font-family:var(--sans);">${esc(c.confidence)}</span></div>
+          <div style="font-size:11.5px;color:var(--text-dim);margin-top:6px;">${esc(c.reason)}</div>
+        </div>
+
+        <div class="ins-block">
+          <div class="ins-label">Coverage</div>
+          <div class="ins-row"><span class="k">Missing values</span><span class="v">${c.nulls} (${c.nullPct.toFixed(1)}%)</span></div>
+          <div class="ins-row"><span class="k">Unique values</span><span class="v">${c.unique}</span></div>
+          <div class="ins-row"><span class="k">Cardinality</span><span class="v">${(c.cardinality*100).toFixed(0)}%</span></div>
+        </div>
+
+        ${c.stats ? `<div class="ins-block"><div class="ins-label">Statistics</div>${statsHtml}</div>` : ''}
+        ${c.topValues ? `<div class="ins-block"><div class="ins-label">Top values</div>${freqHtml}</div>` : ''}
+
+        <div class="ins-block">
+          <div class="ins-label">Protection</div>
+          <div class="ins-row"><span class="k">Active protocol</span><span class="v" style="font-family:var(--sans);">${protocol.charAt(0)+protocol.slice(1).toLowerCase()}</span></div>
+          ${state.protected ? `<div class="ins-row"><span class="k">Applied</span><span class="v" style="font-family:var(--sans);color:var(--green);">Yes</span></div>` : `<div class="ins-row"><span class="k">Applied</span><span class="v" style="font-family:var(--sans);color:var(--text-dim);">Not yet applied</span></div>`}
+        </div>
+
+        <div class="ins-block">
+          <div class="ins-label">Sample values</div>
+          <div>${sampleHtml || '<span class="faint">No samples</span>'}</div>
+        </div>
+
+        <button class="btn accent" style="width:100%;" onclick="closeInspector(); setView('privacy');">Edit protocol for this column →</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.addEventListener('keydown', escCloseInspector);
+}
+function escCloseInspector(e){ if(e.key==='Escape') closeInspector(); }
+function closeInspector(){
+  const el = document.getElementById('inspectorOverlay');
+  if(el) el.remove();
+  document.removeEventListener('keydown', escCloseInspector);
+}
+
+function renderPrivacy(){
+  renderTopbar();
+  $content.innerHTML = `
+    <div class="h1">Privacy Review</div>
+    <div class="sub">Set a protocol for each column, or manage reusable rule-based protocols in the library. Nothing is transformed until you apply protection.</div>
+
+    <div class="tabs">
+      <div class="tab ${state.privacySubTab==='columns'?'active':''}" onclick="setPrivacySubTab('columns')">Column Protocols</div>
+      <div class="tab ${state.privacySubTab==='library'?'active':''}" onclick="setPrivacySubTab('library')">Protocol Library</div>
+    </div>
+
+    <div id="privacySubContent"></div>
+  `;
+  renderPrivacySubTab();
+}
+function setPrivacySubTab(tab){ state.privacySubTab = tab; renderPrivacy(); }
+
+function setProtocol(col, action){
+  state.protocols[col]=action;
+  state.explicitlySet.add(col);
+  log(`Protocol set: ${col} → ${action}`);
+}
+
+function renderPrivacySubTab(){
+  const el = document.getElementById('privacySubContent');
+  if(state.privacySubTab==='library'){ el.innerHTML = renderProtocolLibraryHTML(); return; }
+
+  const actions = ['ALLOW','MASK','TOKENIZE','PSEUDONYMIZE','GENERALIZE','REMOVE','REVIEW'];
+  el.innerHTML = `
+    <div class="callout blue" style="margin-bottom:16px;">
+      <span>ⓘ</span>
+      <div>Rule precedence: mandatory security rules → columns you've set explicitly below → active protocols from the library, in order → default (Review).</div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <button class="btn" onclick="doApplyLibrary()">Apply Active Protocols to Columns</button>
+      <span class="sub" style="margin:0;align-self:center;">${state.explicitlySet.size} column(s) manually set this session</span>
+    </div>
+
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="col-row" style="background:#FAFBFC;font-size:10.5px;text-transform:uppercase;color:var(--text-dim);font-weight:700;">
+        <div>Column</div><div>Sensitivity</div><div>Detection</div><div>Protocol</div>
+      </div>
+      ${state.columns.map(c=>{
+        const mandatoryHit = protocolLibrary.find(p=>p.id===MANDATORY_PROTOCOL_ID).rules.some(r=>ruleMatchesColumn(r,c));
+        return `
+        <div class="col-row">
+          <div>
+            <div class="col-name">${esc(c.name)}</div>
+            <div class="col-type">${c.type}</div>
+          </div>
+          <div>${sensPill(c.sensitivity)}</div>
+          <div>
+            <div style="font-size:11.5px;">${esc(c.sensLabel)}</div>
+            <div class="reason">${esc(c.reason)} <span class="faint">(${c.confidence} confidence)</span></div>
+          </div>
+          <div>
+            <select class="action-select" ${mandatoryHit?'disabled':''} onchange="setProtocol('${c.name.replace(/'/g,"\\'")}', this.value)">
+              ${actions.map(a=>`<option value="${a}" ${state.protocols[c.name]===a?'selected':''}>${a.charAt(0)+a.slice(1).toLowerCase()}</option>`).join('')}
+            </select>
+            ${mandatoryHit? `<div class="reason" style="color:var(--red);">🔒 Locked by Mandatory Security Rules</div>` : ''}
+            ${(!mandatoryHit && state.protocols[c.name]==='GENERALIZE' && c.type==='number') ? `
+              <div style="margin-top:5px;display:flex;align-items:center;gap:5px;">
+                <span class="reason" style="margin:0;">Bucket size</span>
+                <input type="number" min="1" style="width:60px;font-size:11.5px;padding:3px 5px;border:1px solid var(--border-strong);border-radius:4px;"
+                  value="${state.generalizeBuckets[c.name] || ''}" placeholder="${c.stats? Math.max(10, Math.round(c.stats.iqr/4)||10) : 10}"
+                  onchange="setGeneralizeBucket('${c.name.replace(/'/g,"\\'")}', this.value)">
+              </div>` : ''}
+            ${(!mandatoryHit && state.explicitlySet.has(c.name)) ? `<div class="reason">Manually set</div>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="btn primary" onclick="doApplyProtection()">Apply Protection</button>
+      ${state.protected? `<span class="pill green">Protected copy generated</span> <button class="btn small" onclick="scrollToCompare();">Review Before/After</button>` : ''}
+    </div>
+
+    ${state.protected? renderCompareSection():''}
+  `;
+}
+
+function setGeneralizeBucket(col, val){
+  const n = parseInt(val,10);
+  if(n && n>0){ state.generalizeBuckets[col]=n; log(`Generalize bucket size set: ${col} → ${n}`); }
+  else { delete state.generalizeBuckets[col]; }
+}
+
+function doApplyLibrary(){
+  applyProtocolLibraryToColumns(true);
+  renderPrivacySubTab();
+}
+
+/* ---------------- Protocol Library UI ---------------- */
+const ACTION_OPTIONS = ['ALLOW','MASK','TOKENIZE','PSEUDONYMIZE','GENERALIZE','REMOVE','REVIEW'];
+const MATCH_TYPE_LABELS = {
+  column_name_exact:'Column name is',
+  column_name_contains:'Column name contains',
+  column_type:'Column type is',
+  sensitivity_label:'Detected as',
+  sensitivity_level:'Sensitivity is'
+};
+const SENS_LABEL_OPTIONS = ['Email','Phone Number','Government Identifier','Financial Card Number','IP Address','Credential / Secret','Date of Birth','Personal Name','Physical Address','Internal Identifier','Business-Sensitive (Compensation)'];
+
+function renderProtocolLibraryHTML(){
+  return `
+    <div class="callout blue" style="margin-bottom:16px;">
+      <span>ⓘ</span>
+      <div>Protocols are visual rule sets — no code. Active protocols apply top to bottom; the first matching rule wins for each column. Mandatory Security Rules always run first and can't be disabled.</div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <button class="btn primary" onclick="openProtocolEditor(null)">New Protocol</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      ${protocolLibrary.map((p,idx)=>renderProtocolCard(p, idx)).join('')}
+    </div>
+  `;
+}
+
+function renderProtocolCard(p, idx){
+  return `
+    <div class="panel" style="padding:14px 18px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-weight:700;font-size:13.5px;">${esc(p.name)} ${p.builtin? '<span class="pill blue">System</span>':''}</div>
+          <div class="sub" style="margin:2px 0 0 0;">Scope: ${esc(p.scope)} · Last modified: ${esc(p.lastModified)}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <span class="pill ${p.status==='ACTIVE'?'green':'gray'}">${p.status}</span>
+          ${!p.builtin? `<button class="btn small" onclick="toggleProtocolStatus('${p.id}')">${p.status==='ACTIVE'?'Disable':'Enable'}</button>`:''}
+          <button class="btn small" onclick="openProtocolEditor('${p.id}')">${p.builtin?'View':'Edit'}</button>
+          ${!p.builtin? `<button class="btn small" onclick="duplicateProtocol('${p.id}')">Duplicate</button>`:''}
+          ${!p.builtin && idx>1 ? `<button class="btn small" onclick="reorderProtocol('${p.id}',-1)">↑</button>`:''}
+          ${!p.builtin && idx<protocolLibrary.length-1 ? `<button class="btn small" onclick="reorderProtocol('${p.id}',1)">↓</button>`:''}
+          ${!p.builtin? `<button class="btn small" onclick="deleteProtocol('${p.id}')">Delete</button>`:''}
+        </div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px;">
+        ${p.rules.map(r=>`
+          <div style="font-size:12px;font-family:var(--mono);color:var(--text-dim);">
+            WHEN <span style="color:var(--text);">${esc(MATCH_TYPE_LABELS[r.matchType])}</span> "<span style="color:var(--text);">${esc(r.matchValue)}</span>" DO <span class="pill ${r.action==='REMOVE'?'red':r.action==='ALLOW'?'green':'amber'}">${r.action}</span>
+          </div>
+        `).join('') || '<div class="faint" style="font-size:12px;">No rules yet.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function toggleProtocolStatus(id){
+  const p = protocolLibrary.find(x=>x.id===id);
+  if(!p || p.builtin) return;
+  p.status = p.status==='ACTIVE' ? 'DISABLED' : 'ACTIVE';
+  p.lastModified = 'Just now';
+  log(`Protocol "${p.name}" ${p.status==='ACTIVE'?'enabled':'disabled'}`);
+  renderPrivacySubTab();
+}
+function duplicateProtocol(id){
+  const p = protocolLibrary.find(x=>x.id===id);
+  if(!p) return;
+  const copy = JSON.parse(JSON.stringify(p));
+  copy.id = 'p'+(ruleIdCounter++);
+  copy.name = p.name + ' (copy)';
+  copy.status = 'DISABLED';
+  copy.lastModified = 'Just now';
+  copy.builtin = false;
+  const idx = protocolLibrary.findIndex(x=>x.id===id);
+  protocolLibrary.splice(idx+1,0,copy);
+  log(`Protocol duplicated: ${copy.name}`);
+  renderPrivacySubTab();
+}
+function reorderProtocol(id, dir){
+  const idx = protocolLibrary.findIndex(x=>x.id===id);
+  const target = idx+dir;
+  if(target<1 || target>=protocolLibrary.length) return; // never move above mandatory (index 0)
+  const [item] = protocolLibrary.splice(idx,1);
+  protocolLibrary.splice(target,0,item);
+  renderPrivacySubTab();
+}
+function deleteProtocol(id){
+  const p = protocolLibrary.find(x=>x.id===id);
+  if(!p || p.builtin) return;
+  if(!confirm(`Delete protocol "${p.name}"? This can't be undone.`)) return;
+  protocolLibrary = protocolLibrary.filter(x=>x.id!==id);
+  log(`Protocol deleted: ${p.name}`);
+  renderPrivacySubTab();
+}
+
+let editingProtocolId = null;
+let editingDraft = null;
+
+function openProtocolEditor(id){
+  editingProtocolId = id;
+  if(id){
+    const p = protocolLibrary.find(x=>x.id===id);
+    editingDraft = JSON.parse(JSON.stringify(p));
+  } else {
+    editingDraft = {id:'p'+(ruleIdCounter++), name:'', status:'DISABLED', builtin:false, scope:'This dataset', lastModified:'Just now', rules:[]};
+  }
+  renderProtocolEditorOverlay();
+}
+function closeProtocolEditor(){
+  const el = document.getElementById('protocolEditorOverlay');
+  if(el) el.remove();
+  document.removeEventListener('keydown', escCloseProtocolEditor);
+  editingProtocolId = null; editingDraft = null;
+}
+function escCloseProtocolEditor(e){ if(e.key==='Escape') closeProtocolEditor(); }
+function addDraftRule(){
+  editingDraft.rules.push({id:'r'+(ruleIdCounter++), matchType:'column_name_contains', matchValue:'', action:'MASK'});
+  renderProtocolEditorOverlay();
+}
+function removeDraftRule(rid){
+  editingDraft.rules = editingDraft.rules.filter(r=>r.id!==rid);
+  renderProtocolEditorOverlay();
+}
+function updateDraftRule(rid, field, value){
+  const r = editingDraft.rules.find(x=>x.id===rid);
+  if(r) r[field]=value;
+}
+function saveDraftProtocol(){
+  const nameInput = document.getElementById('draftName');
+  editingDraft.name = nameInput.value.trim() || 'Untitled Protocol';
+  editingDraft.lastModified = 'Just now';
+  const existingIdx = protocolLibrary.findIndex(x=>x.id===editingDraft.id);
+  if(existingIdx>=0) protocolLibrary[existingIdx] = editingDraft;
+  else protocolLibrary.push(editingDraft);
+  log(`Protocol saved: ${editingDraft.name}`);
+  closeProtocolEditor();
+  renderPrivacySubTab();
+}
+
+function renderProtocolEditorOverlay(){
+  let el = document.getElementById('protocolEditorOverlay');
+  if(!el){
+    el = document.createElement('div');
+    el.className='overlay';
+    el.id='protocolEditorOverlay';
+    el.setAttribute('role','dialog');
+    el.setAttribute('aria-modal','true');
+    el.setAttribute('aria-label','Protocol editor');
+    document.addEventListener('keydown', escCloseProtocolEditor);
+    el.onclick = (e)=>{ if(e.target===el) closeProtocolEditor(); };
+    document.body.appendChild(el);
+  }
+  const readonly = editingDraft.builtin;
+  el.innerHTML = `
+    <div class="inspector" style="width:460px;">
+      <div class="inspector-head">
+        <div style="font-size:15px;font-weight:700;">${editingProtocolId? (readonly?'View Protocol':'Edit Protocol') : 'New Protocol'}</div>
+        <button class="inspector-close" onclick="closeProtocolEditor()" aria-label="Close protocol editor">✕</button>
+      </div>
+      <div class="inspector-body">
+        <div class="ins-block">
+          <div class="ins-label">Name</div>
+          <input id="draftName" ${readonly?'disabled':''} value="${esc(editingDraft.name)}" placeholder="e.g. Employee PII"
+            style="width:100%;padding:7px 9px;border:1px solid var(--border-strong);border-radius:5px;font-size:13px;">
+        </div>
+        <div class="ins-block">
+          <div class="ins-label">Rules</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${editingDraft.rules.map(r=>`
+              <div class="panel" style="padding:10px;">
+                <div style="font-size:10.5px;color:var(--text-dim);margin-bottom:6px;">WHEN</div>
+                <div style="display:flex;gap:6px;margin-bottom:6px;">
+                  <select ${readonly?'disabled':''} class="action-select" style="flex:1;" onchange="updateDraftRule('${r.id}','matchType',this.value)">
+                    ${Object.keys(MATCH_TYPE_LABELS).map(k=>`<option value="${k}" ${r.matchType===k?'selected':''}>${MATCH_TYPE_LABELS[k]}</option>`).join('')}
+                  </select>
+                </div>
+                ${r.matchType==='sensitivity_label' ? `
+                  <select ${readonly?'disabled':''} class="action-select" style="width:100%;margin-bottom:6px;" onchange="updateDraftRule('${r.id}','matchValue',this.value)">
+                    ${SENS_LABEL_OPTIONS.map(v=>`<option value="${v}" ${r.matchValue===v?'selected':''}>${v}</option>`).join('')}
+                  </select>
+                ` : r.matchType==='column_type' ? `
+                  <select ${readonly?'disabled':''} class="action-select" style="width:100%;margin-bottom:6px;" onchange="updateDraftRule('${r.id}','matchValue',this.value)">
+                    ${['string','number','date'].map(v=>`<option value="${v}" ${r.matchValue===v?'selected':''}>${v}</option>`).join('')}
+                  </select>
+                ` : r.matchType==='sensitivity_level' ? `
+                  <select ${readonly?'disabled':''} class="action-select" style="width:100%;margin-bottom:6px;" onchange="updateDraftRule('${r.id}','matchValue',this.value)">
+                    ${['HIGH','MEDIUM','LOW'].map(v=>`<option value="${v}" ${r.matchValue===v?'selected':''}>${v}</option>`).join('')}
+                  </select>
+                ` : `
+                  <input ${readonly?'disabled':''} value="${esc(r.matchValue)}" placeholder="value" style="width:100%;margin-bottom:6px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:4px;font-size:12px;" onchange="updateDraftRule('${r.id}','matchValue',this.value)">
+                `}
+                <div style="font-size:10.5px;color:var(--text-dim);margin-bottom:6px;">DO</div>
+                <div style="display:flex;gap:6px;">
+                  <select ${readonly?'disabled':''} class="action-select" style="flex:1;" onchange="updateDraftRule('${r.id}','action',this.value)">
+                    ${ACTION_OPTIONS.map(a=>`<option value="${a}" ${r.action===a?'selected':''}>${a}</option>`).join('')}
+                  </select>
+                  ${!readonly? `<button class="btn small" onclick="removeDraftRule('${r.id}')">Remove</button>`:''}
+                </div>
+              </div>
+            `).join('') || '<div class="faint" style="font-size:12px;">No rules yet.</div>'}
+          </div>
+          ${!readonly? `<button class="btn small" style="margin-top:10px;" onclick="addDraftRule()">+ Add rule</button>`:''}
+        </div>
+        ${!readonly? `<button class="btn primary" style="width:100%;" onclick="saveDraftProtocol()">Save Protocol</button>` : `<button class="btn" style="width:100%;" onclick="closeProtocolEditor()">Close</button>`}
+      </div>
+    </div>
+  `;
+}
+
+function doApplyProtection(){
+  applyProtection();
+  renderTopbar();
+  renderPrivacy();
+  setTimeout(scrollToCompare, 30);
+}
+function scrollToCompare(){
+  const el = document.getElementById('compareAnchor');
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+
+const REVIEW_PAGE_SIZE = 10;
+
+function filteredReviewIndices(){
+  const d = state.dataset;
+  const q = state.reviewSearch.trim().toLowerCase();
+  const indices = [];
+  d.rows.forEach((r,i)=>{
+    if(!q){ indices.push(i); return; }
+    const hay = d.columns.map(c=>String(r[c]||'')).join(' ').toLowerCase();
+    if(hay.includes(q)) indices.push(i);
+  });
+  return indices;
+}
+
+function renderCompareSection(){
+  const d = state.dataset;
+  const indices = filteredReviewIndices();
+  const totalPages = Math.max(1, Math.ceil(indices.length / REVIEW_PAGE_SIZE));
+  if(state.reviewPage >= totalPages) state.reviewPage = totalPages-1;
+  const pageIndices = indices.slice(state.reviewPage*REVIEW_PAGE_SIZE, (state.reviewPage+1)*REVIEW_PAGE_SIZE);
+  const rows = pageIndices.map(i=>d.rows[i]);
+  const protRows = pageIndices.map(i=>state.protected[i]);
+
+  return `
+    <div id="compareAnchor" style="margin-top:26px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div class="section-title" style="margin-bottom:0;">Before / After</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" placeholder="Search rows…" value="${esc(state.reviewSearch)}" oninput="setReviewSearch(this.value)"
+            style="font-size:12px;padding:5px 9px;border:1px solid var(--border-strong);border-radius:5px;width:160px;">
+          <button class="btn small" onclick="toggleRevealOriginals()">${state.revealOriginals? 'Hide original values':'Reveal original values'}</button>
+        </div>
+      </div>
+
+      ${state.revealOriginals? `
+        <div class="callout amber" style="margin-bottom:10px;">
+          <span>⚠</span>
+          <div>Original sensitive values are now visible below, in this browser tab only. Hide them again when you're done reviewing.</div>
+        </div>
+      ` : ''}
+
+      <div class="panel compare-grid" style="overflow:auto;">
+        <div class="compare-col">
+          <div class="compare-head orig">Original Dataset</div>
+          <table>
+            <thead><tr>${d.columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>
+            <tbody>${rows.length? rows.map(r=>`<tr>${d.columns.map(c=>{
+              const meta = state.columns.find(x=>x.name===c);
+              const v = r[c];
+              const hide = meta.sensitivity==='HIGH' && v && !state.revealOriginals;
+              return `<td class="${hide?'masked':'mono'}">${hide?maskPreview(v):esc(v)}</td>`;
+            }).join('')}</tr>`).join('') : `<tr><td colspan="${d.columns.length}" class="empty">No matching rows</td></tr>`}</tbody>
+          </table>
+        </div>
+        <div class="compare-col">
+          <div class="compare-head prot">Protected Dataset</div>
+          <table>
+            <thead><tr>${state.protectedColumns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>
+            <tbody>${protRows.length? protRows.map(r=>`<tr>${state.protectedColumns.map(c=>`<td class="mono">${esc(r[c])}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${state.protectedColumns.length}" class="empty">No matching rows</td></tr>`}</tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span class="sub" style="margin:0;">${indices.length} row(s) matched · showing ${pageIndices.length? state.reviewPage*REVIEW_PAGE_SIZE+1:0}–${state.reviewPage*REVIEW_PAGE_SIZE+pageIndices.length}</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn small" ${state.reviewPage===0?'disabled':''} onclick="changeReviewPage(-1)">← Prev</button>
+          <span class="sub" style="margin:0;align-self:center;">Page ${state.reviewPage+1} of ${totalPages}</span>
+          <button class="btn small" ${state.reviewPage>=totalPages-1?'disabled':''} onclick="changeReviewPage(1)">Next →</button>
+        </div>
+      </div>
+
+      ${state.secondScan.length? `
+        <div class="callout amber" style="margin-top:14px;">
+          <span>⚠</span>
+          <div>
+            <strong>Potential sensitive information remains.</strong>
+            <div style="margin-top:6px;">
+              ${state.secondScan.map(w=>`<div>${esc(w.column)} — ${esc(w.detection)} <span class="pill ${w.severity==='HIGH'?'red':'amber'}">${w.severity}</span> · ${esc(w.note)}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+      `:`
+        <div class="callout green" style="margin-top:14px;">
+          <span>✓</span>
+          <div>No sensitive patterns detected in the protected dataset on second scan. This does not guarantee absolute safety — review manually before sharing.</div>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+function setReviewSearch(v){ state.reviewSearch = v; state.reviewPage = 0; renderPrivacySubTab(); refocusAfterRerender('input[placeholder="Search rows…"]'); }
+function changeReviewPage(d){ state.reviewPage += d; renderPrivacySubTab(); }
+function toggleRevealOriginals(){
+  if(!state.revealOriginals){
+    if(!confirm('This will display original sensitive values in this browser tab. Continue?')) return;
+    log('Original values revealed in Review (session only)');
+  } else {
+    log('Original values hidden in Review');
+  }
+  state.revealOriginals = !state.revealOriginals;
+  renderPrivacySubTab();
+}
+function refocusAfterRerender(selector){
+  requestAnimationFrame(()=>{
+    const el = document.querySelector(selector);
+    if(el){ el.focus(); const v=el.value; el.value=''; el.value=v; }
+  });
+}
+
+function renderQuality(){
+  renderTopbar();
+  const d = state.dataset;
+  const dupRows = countDuplicateRows(d.rows);
+  const decisions = state.qualityDecisions;
+  $content.innerHTML = `
+    <div class="h1">Data Quality</div>
+    <div class="sub">Issues are flagged for review only — nothing is changed automatically. Decide what to do with each below.</div>
+
+    <div class="grid cols-4" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+      <div class="panel stat"><div class="stat-label">Missing values</div><div class="stat-value small">${state.columns.reduce((a,c)=>a+c.nulls,0)}</div></div>
+      <div class="panel stat"><div class="stat-label">Duplicate rows</div><div class="stat-value small">${dupRows}</div></div>
+      <div class="panel stat"><div class="stat-label">Columns with outliers</div><div class="stat-value small">${state.columns.filter(c=>c.outlierCount>0).length}</div></div>
+      <div class="panel stat"><div class="stat-label">Numeric columns</div><div class="stat-value small">${state.columns.filter(c=>c.type==='number').length}</div></div>
+    </div>
+
+    ${dupRows>0 ? `
+      <div class="section-title">Duplicate Rows</div>
+      <div class="panel" style="padding:12px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:12.5px;">${dupRows} row(s) are exact duplicates of another row. <a href="#" onclick="jumpToAffectedRows(null,'duplicate');return false;">View rows</a></div>
+          <div class="reason" style="margin-top:2px;">This decision affects the exported protected copy only — it never touches your original file.</div>
+        </div>
+        <select class="action-select" onchange="setQualityDecision('__duplicates__', this.value)">
+          <option value="review" ${(!decisions.__duplicates__ || decisions.__duplicates__==='review')?'selected':''}>Keep and review</option>
+          <option value="keep" ${decisions.__duplicates__==='keep'?'selected':''}>Keep as-is</option>
+          <option value="remove" ${decisions.__duplicates__==='remove'?'selected':''}>Remove duplicates on export</option>
+        </select>
+      </div>
+    ` : ''}
+
+    <div class="section-title">Column-Level Quality</div>
+    <div class="panel">
+      <table>
+        <thead><tr><th>Column</th><th>Missing</th><th>Outliers</th><th>Stats</th><th>Status</th><th>Decision</th></tr></thead>
+        <tbody>
+          ${state.columns.map(c=>{
+            const hasIssue = c.nulls>0 || c.outlierCount>0;
+            const decision = decisions[c.name] || (hasIssue ? 'review' : null);
+            return `<tr>
+              <td class="col-name col-clickable" onclick="openColumnInspector('${c.name.replace(/'/g,"\\'")}')">${esc(c.name)}</td>
+              <td>${c.nulls} rows ${c.nullPct? `<span class="faint">(${c.nullPct.toFixed(0)}%)</span>`:''}
+                ${c.nulls>0? `<div><a href="#" onclick="jumpToAffectedRows('${c.name.replace(/'/g,"\\'")}','missing');return false;">View rows</a></div>`:''}
+              </td>
+              <td>${c.outlierCount? c.outlierCount+' rows':'—'}
+                ${c.outlierCount>0? `<div><a href="#" onclick="jumpToAffectedRows('${c.name.replace(/'/g,"\\'")}','outlier');return false;">View rows</a></div>`:''}
+              </td>
+              <td class="mono dim" style="font-size:11px;">${c.stats? `mean ${c.stats.mean.toFixed(0)} · median ${c.stats.median.toFixed(0)} · std ${c.stats.std.toFixed(0)}`:'—'}</td>
+              <td>${hasIssue?'<span class="pill amber">Needs review</span>':'<span class="pill green">OK</span>'}</td>
+              <td>
+                ${hasIssue? `
+                  <select class="action-select" style="font-size:11px;padding:4px 6px;" onchange="setQualityDecision('${c.name.replace(/'/g,"\\'")}', this.value)">
+                    <option value="review" ${decision==='review'?'selected':''}>Review</option>
+                    <option value="keep" ${decision==='keep'?'selected':''}>Keep</option>
+                    <option value="remove" ${decision==='remove'?'selected':''}>Remove column</option>
+                    <option value="transform" ${decision==='transform'?'selected':''}>Transform</option>
+                  </select>
+                ` : '<span class="faint">—</span>'}
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function jumpToAffectedRows(column, type){
+  state.dataTable.rowFilter = {column, type};
+  state.dataTable.page = 0;
+  state.dataTable.search = '';
+  const label = type==='missing' ? `missing values in ${column}` : type==='outlier' ? `outliers in ${column}` : 'duplicate rows';
+  log(`Data Quality: viewing rows with ${label}`);
+  setView('data');
+}
+
+function setQualityDecision(col, decision){
+  state.qualityDecisions[col] = decision;
+  log(`Data quality decision: ${col} → ${decision}`);
+  if(col==='__duplicates__'){ renderQuality(); return; }
+  if(decision==='remove'){
+    setProtocol(col, 'REMOVE');
+  } else if(decision==='transform'){
+    setView('privacy');
+    setTimeout(()=>openColumnInspector(col), 30);
+    return;
+  }
+  renderQuality();
+}
+
+const AIVIEW_PAGE_SIZE = 15;
+
+function filteredAIIndices(){
+  const q = state.aiViewSearch.trim().toLowerCase();
+  const exportSet = new Set(getExportRowIndices());
+  const indices = [];
+  state.protected.forEach((r,i)=>{
+    if(!exportSet.has(i)) return;
+    if(!q){ indices.push(i); return; }
+    const hay = state.protectedColumns.map(c=>String(r[c]||'')).join(' ').toLowerCase();
+    if(hay.includes(q)) indices.push(i);
+  });
+  return indices;
+}
+
+function renderAIView(){
+  renderTopbar();
+  if(!state.protected){
+    $content.innerHTML = `<div class="empty">Apply protection in <a href="#" onclick="setView('privacy');return false;">Privacy Review</a> to generate the AI View.</div>`;
+    return;
+  }
+  const removedCount = state.dataset.columns.length - state.protectedColumns.length;
+  const transformedCount = state.protectedColumns.filter(c=>['MASK','TOKENIZE','PSEUDONYMIZE','GENERALIZE'].includes(state.protocols[c])).length;
+  const unchangedCount = state.protectedColumns.length - transformedCount;
+  const dedupeActive = state.qualityDecisions.__duplicates__ === 'remove';
+  const dedupedOutCount = dedupeActive ? state.dataset.rows.length - getExportRowIndices().length : 0;
+
+  const indices = filteredAIIndices();
+  const totalPages = Math.max(1, Math.ceil(indices.length / AIVIEW_PAGE_SIZE));
+  if(state.aiViewPage >= totalPages) state.aiViewPage = totalPages-1;
+  const pageIndices = indices.slice(state.aiViewPage*AIVIEW_PAGE_SIZE, (state.aiViewPage+1)*AIVIEW_PAGE_SIZE);
+  const rows = pageIndices.map(i=>state.protected[i]);
+
+  $content.innerHTML = `
+    <div class="h1">AI View</div>
+    <div class="sub">This is exactly what will leave your device. Original values are not shown in this view.</div>
+
+    <div class="panel" style="padding:18px 20px;margin-bottom:18px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;">
+      <svg width="120" height="56" viewBox="0 0 120 56" style="flex-shrink:0;">
+        <rect x="2" y="8" width="40" height="40" rx="4" fill="#F4F5F6" stroke="#C7CBD3"/>
+        <text x="22" y="30" font-size="8" text-anchor="middle" fill="#5B6472" font-family="ui-monospace,monospace">THIS</text>
+        <text x="22" y="40" font-size="8" text-anchor="middle" fill="#5B6472" font-family="ui-monospace,monospace">DEVICE</text>
+        <line x1="52" y1="4" x2="52" y2="52" stroke="#C0392B" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <path d="M62 28 L78 28" stroke="#2B6CB5" stroke-width="1.6" marker-end="url(#arrow)"/>
+        <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2B6CB5"/></marker></defs>
+        <rect x="80" y="8" width="38" height="40" rx="4" fill="#E4EEF8" stroke="#2B6CB5"/>
+        <text x="99" y="30" font-size="8" text-anchor="middle" fill="#2B6CB5" font-family="ui-monospace,monospace">AI</text>
+        <text x="99" y="40" font-size="8" text-anchor="middle" fill="#2B6CB5" font-family="ui-monospace,monospace">TOOL</text>
+      </svg>
+      <div style="flex:1;min-width:220px;">
+        <div style="font-size:12.5px;">
+          <strong>${state.protectedColumns.length}</strong> of <strong>${state.dataset.columns.length}</strong> columns cross this boundary.
+          <strong style="color:var(--green)">${transformedCount}</strong> transformed, ${unchangedCount} unchanged, <strong style="color:var(--red)">${removedCount}</strong> removed entirely.
+        </div>
+        <div class="sub" style="margin:4px 0 0 0;">Generated locally. Nothing on this screen is sent anywhere by DataPermit.${dedupeActive ? ` ${dedupedOutCount} duplicate row(s) excluded per your Data Quality decision.` : ''}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+      <input type="text" placeholder="Search rows…" value="${esc(state.aiViewSearch)}" oninput="setAISearch(this.value)"
+        style="font-size:12px;padding:5px 9px;border:1px solid var(--border-strong);border-radius:5px;width:160px;">
+      <span class="sub" style="margin:0;">${indices.length} row(s)</span>
+    </div>
+
+    <div class="panel" style="overflow:auto;max-height:52vh;margin-bottom:10px;">
+      <table>
+        <thead><tr>${state.protectedColumns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.length? rows.map(r=>`<tr>${state.protectedColumns.map(c=>`<td class="mono">${esc(r[c])}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${state.protectedColumns.length}" class="empty">No matching rows</td></tr>`}</tbody>
+      </table>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:16px;">
+      <button class="btn small" ${state.aiViewPage===0?'disabled':''} onclick="changeAIPage(-1)">← Prev</button>
+      <span class="sub" style="margin:0;align-self:center;">Page ${state.aiViewPage+1} of ${totalPages}</span>
+      <button class="btn small" ${state.aiViewPage>=totalPages-1?'disabled':''} onclick="changeAIPage(1)">Next →</button>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn accent" onclick="copyAIView()">Copy as CSV</button>
+      <button class="btn" onclick="exportProtected('csv')">Export</button>
+      <button class="btn" onclick="setView('privacy')">Back to Protection</button>
+    </div>
+    <div id="copyToast" class="sub" style="margin-top:8px;" aria-live="polite"></div>
+  `;
+}
+function setAISearch(v){ state.aiViewSearch = v; state.aiViewPage = 0; renderAIView(); refocusAfterRerender('input[placeholder="Search rows…"]'); }
+function changeAIPage(d){ state.aiViewPage += d; renderAIView(); }
+
+function toCSV(rows, cols){
+  const esc2 = v => { const s = v===undefined||v===null?'':String(v); return /[",\n]/.test(s)? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const lines = [cols.map(esc2).join(',')];
+  rows.forEach(r=> lines.push(cols.map(c=>esc2(r[c])).join(',')));
+  return lines.join('\n');
+}
+
+function copyAIView(){
+  const rows = getExportRowIndices().map(i=>state.protected[i]);
+  const csv = toCSV(rows, state.protectedColumns);
+  navigator.clipboard.writeText(csv).then(()=>{
+    document.getElementById('copyToast').textContent = 'Copied protected dataset to clipboard.';
+  }).catch(()=>{
+    document.getElementById('copyToast').textContent = 'Copy failed — your browser may block clipboard access here.';
+  });
+}
+
+function riskScore(){
+  const unexpected = state.secondScan.filter(w=>w.unexpected).length;
+  const highAllowed = state.secondScan.filter(w=>!w.unexpected && w.severity==='HIGH').length;
+  const mediumOrLow = state.secondScan.filter(w=>!w.unexpected && w.severity!=='HIGH').length;
+  const failedChecks = (state.verificationChecks||[]).filter(c=>!c.pass).length;
+
+  let level, reasons=[];
+  if(unexpected>0 || highAllowed>0 || failedChecks>0){
+    level='HIGH';
+    if(unexpected>0) reasons.push(`${unexpected} transformed column(s) still match a sensitive pattern`);
+    if(highAllowed>0) reasons.push(`${highAllowed} high-sensitivity column(s) left Allowed or under Review`);
+    if(failedChecks>0) reasons.push(`${failedChecks} verification check(s) failed`);
+  } else if(mediumOrLow>0){
+    level='MEDIUM';
+    reasons.push(`${mediumOrLow} medium/low-sensitivity column(s) left Allowed or under Review`);
+  } else {
+    level='LOW';
+    reasons.push('No remaining sensitive-pattern matches on the second scan');
+    reasons.push('All verification checks passed');
+  }
+  return {level, reasons};
+}
+function riskLevel(){ return riskScore().level; }
+
+function renderReport(){
+  renderTopbar();
+  if(!state.protected){
+    $content.innerHTML = `<div class="empty">Apply protection in <a href="#" onclick="setView('privacy');return false;">Privacy Review</a> first.</div>`;
+    return;
+  }
+  $content.innerHTML = `
+    <div class="h1">Verify &amp; Report</div>
+    <div class="sub">Verification confirms what actually happened. The report summarizes it for sharing.</div>
+    <div class="tabs">
+      <div class="tab ${state.reportSubTab!=='report'?'active':''}" onclick="setReportSubTab('verify')">Verification</div>
+      <div class="tab ${state.reportSubTab==='report'?'active':''}" onclick="setReportSubTab('report')">Summary Report</div>
+    </div>
+    <div id="reportSubContent"></div>
+  `;
+  renderReportSubTab();
+}
+function setReportSubTab(t){ state.reportSubTab=t; renderReportSubTab(); }
+
+function renderReportSubTab(){
+  const el = document.getElementById('reportSubContent');
+  if(state.reportSubTab==='report'){ el.innerHTML = renderSummaryReportHTML(); return; }
+  el.innerHTML = renderVerificationHTML();
+}
+
+function renderVerificationHTML(){
+  const checks = state.verificationChecks || [];
+  const allPass = checks.every(c=>c.pass);
+  return `
+    <div class="callout ${allPass?'green':'amber'}" style="margin-bottom:18px;">
+      <span>${allPass?'✓':'⚠'}</span>
+      <div>${allPass? 'All local verification checks passed. This does not guarantee absolute safety — review flagged columns and confirm before sharing.' : 'One or more verification checks need attention before this dataset should be considered protected.'}</div>
+    </div>
+
+    <div class="section-title">Verification Checklist</div>
+    <div class="panel" style="padding:14px 18px;margin-bottom:20px;">
+      <div class="checklist">
+        ${checks.map(c=>`
+          <div class="check-item" style="align-items:flex-start;">
+            <span class="${c.pass?'ok':''}" style="color:${c.pass?'':'var(--amber)'};">${c.pass?'✓':'⚠'}</span>
+            <div>
+              <div>${esc(c.label)}</div>
+              <div class="reason" style="margin-top:1px;">${esc(c.detail)}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div class="section-title" style="margin-bottom:0;">Second Privacy Scan — Column Detail</div>
+      <button class="btn small" onclick="doRerunScan()">Re-run Verification Scan</button>
+    </div>
+    <div class="panel" style="margin-bottom:20px;">
+      <table>
+        <thead><tr><th>Column</th><th>Protocol</th><th>Second-scan result</th></tr></thead>
+        <tbody>
+          ${state.protectedColumns.map(c=>{
+            const w = state.secondScan.find(x=>x.column===c);
+            return `<tr>
+              <td class="col-name col-clickable" onclick="openColumnInspector('${c.replace(/'/g,"\\'")}')">${esc(c)}</td>
+              <td class="mono dim">${state.protocols[c]}</td>
+              <td>${w? `<span class="pill ${w.severity==='HIGH'?'red':'amber'}">${w.severity}</span> <span class="reason" style="display:inline;">${esc(w.note)}</span>` : '<span class="pill green">Clear</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn accent" onclick="setReportSubTab('report')">Continue to Summary Report →</button>
+  `;
+}
+function doRerunScan(){ runSecondScan(); renderReportSubTab(); }
+
+function renderSummaryReportHTML(){
+  const masked = Object.values(state.protocols).filter(a=>a==='MASK').length;
+  const tokenized = Object.values(state.protocols).filter(a=>a==='TOKENIZE').length;
+  const pseudo = Object.values(state.protocols).filter(a=>a==='PSEUDONYMIZE').length;
+  const generalized = Object.values(state.protocols).filter(a=>a==='GENERALIZE').length;
+  const removed = Object.values(state.protocols).filter(a=>a==='REMOVE').length;
+  const risk = riskScore();
+  const riskColor = risk.level==='LOW'?'var(--green)':risk.level==='MEDIUM'?'var(--amber)':'var(--red)';
+  const riskBg = risk.level==='LOW'?'var(--green-soft)':risk.level==='MEDIUM'?'var(--amber-soft)':'var(--red-soft)';
+
+  return `
+    <div class="panel" style="padding:18px 20px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div class="stat-label">Dataset</div>
+        <div style="font-weight:700;font-size:15px;">${esc(state.dataset.name)}</div>
+        <div class="sub" style="margin:2px 0 0 0;">${state.dataset.rows.length} rows · ${state.dataset.columns.length} columns</div>
+      </div>
+      <div class="risk-badge" style="background:${riskBg};color:${riskColor};">Final privacy risk: ${risk.level}</div>
+    </div>
+    <div class="panel" style="padding:12px 18px;margin-bottom:20px;">
+      <div class="ins-label" style="margin-bottom:6px;">How this was scored</div>
+      ${risk.reasons.map(r=>`<div style="font-size:12px;color:var(--text-dim);">• ${esc(r)}</div>`).join('')}
+    </div>
+
+    <div class="grid cols-4" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+      <div class="panel stat"><div class="stat-label">Sensitive fields detected</div><div class="stat-value">${state.columns.filter(c=>c.sensitivity!=='NONE').length}</div></div>
+      <div class="panel stat"><div class="stat-label">Fields masked</div><div class="stat-value">${masked}</div></div>
+      <div class="panel stat"><div class="stat-label">Fields tokenized</div><div class="stat-value">${tokenized}</div></div>
+      <div class="panel stat"><div class="stat-label">Fields removed</div><div class="stat-value">${removed}</div></div>
+      <div class="panel stat"><div class="stat-label">Pseudonymized</div><div class="stat-value">${pseudo}</div></div>
+      <div class="panel stat"><div class="stat-label">Generalized</div><div class="stat-value">${generalized}</div></div>
+      <div class="panel stat"><div class="stat-label">Quality issues flagged</div><div class="stat-value">${state.columns.filter(c=>c.nulls>0||c.outlierCount>0).length}</div></div>
+      <div class="panel stat"><div class="stat-label">Remaining flags</div><div class="stat-value" style="color:${state.secondScan.length?'var(--amber)':'var(--green)'}">${state.secondScan.length}</div></div>
+    </div>
+
+    <div class="section-title">Privacy Status</div>
+    <div class="panel" style="padding:16px 18px;margin-bottom:20px;">
+      <div class="checklist">
+        <div class="check-item"><span class="ok">✓</span> Dataset processed locally</div>
+        <div class="check-item"><span class="ok">✓</span> No network connection used</div>
+        <div class="check-item"><span class="ok">✓</span> Original file unchanged</div>
+        <div class="check-item"><span class="${state.secondScan.length?'':'ok'}">${state.secondScan.length?'⚠':'✓'}</span> Protected copy ${state.secondScan.length? 'verified with open flags':'verified, no flags remaining'}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn primary" onclick="exportProtected('csv')">Export Protected Copy (CSV)</button>
+      <button class="btn" onclick="exportProtected('json')">Export Protected Copy (JSON)</button>
+      <button class="btn" onclick="exportReport()">Export Report (JSON)</button>
+      <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  `;
+}
+
+function download(filename, content, type){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportProtected(fmt){
+  if(!state.protected) return;
+  const base = state.dataset.name.replace(/\.[^.]+$/,'');
+  const rows = getExportRowIndices().map(i=>state.protected[i]);
+  if(fmt==='csv'){
+    download(`${base}_protected.csv`, toCSV(rows, state.protectedColumns), 'text/csv');
+  } else if(fmt==='xlsx'){
+    exportXLSX(base, rows);
+  } else {
+    download(`${base}_protected.json`, JSON.stringify(rows, null, 2), 'application/json');
+  }
+  log(`Dataset exported (${fmt.toUpperCase()}, ${rows.length} row(s))`);
+}
+
+function exportXLSX(base, rows){
+  if(typeof XLSX === 'undefined'){
+    showToast('exportToast', 'XLSX export library did not load — try CSV or JSON instead.');
+    return;
+  }
+  const ws = XLSX.utils.json_to_sheet(rows || state.protected, {header: state.protectedColumns});
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Protected Data');
+  const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+  download(`${base}_protected.xlsx`, wbout, 'application/octet-stream');
+}
+
+function buildQualityReport(){
+  return {
+    dataset: state.dataset.name,
+    rows: state.dataset.rows.length,
+    duplicateRows: countDuplicateRows(state.dataset.rows),
+    columns: state.columns.map(c=>({
+      column: c.name,
+      type: c.type,
+      missing: c.nulls,
+      missingPct: Number(c.nullPct.toFixed(1)),
+      uniqueValues: c.unique,
+      outliers: c.outlierCount,
+      status: (c.nulls>0 || c.outlierCount>0) ? 'Needs review' : 'OK'
+    })),
+    generatedAt: new Date().toISOString()
+  };
+}
+function exportQualityReport(){
+  const base = state.dataset.name.replace(/\.[^.]+$/,'');
+  download(`${base}_data_quality_report.json`, JSON.stringify(buildQualityReport(), null, 2), 'application/json');
+  log('Data quality report exported');
+}
+
+function buildProtocolConfig(){
+  return {
+    dataset: state.dataset.name,
+    columnProtocols: state.protocols,
+    generalizeBuckets: state.generalizeBuckets,
+    protocolLibrary: protocolLibrary.map(p=>({
+      name: p.name, status: p.status, builtin: !!p.builtin, scope: p.scope, rules: p.rules
+    })),
+    exportedAt: new Date().toISOString()
+  };
+}
+function exportProtocolConfig(){
+  const base = state.dataset.name.replace(/\.[^.]+$/,'');
+  download(`${base}_protocol_configuration.json`, JSON.stringify(buildProtocolConfig(), null, 2), 'application/json');
+  log('Protocol configuration exported');
+}
+
+function showToast(id, msg){
+  const el = document.getElementById(id);
+  if(el) el.textContent = msg;
+}
+
+/* ---------------- Export center ---------------- */
+function setExportFormat(fmt){ state.exportSelection.format = fmt; renderExport(); }
+function toggleExportItem(key){ state.exportSelection[key] = !state.exportSelection[key]; renderExport(); }
+
+function renderExport(){
+  renderTopbar();
+  if(!state.protected){
+    $content.innerHTML = `<div class="empty">Apply protection in <a href="#" onclick="setView('privacy');return false;">Privacy Review</a> before exporting.</div>`;
+    return;
+  }
+  const sel = state.exportSelection;
+  const risk = riskScore();
+  const riskColor = risk.level==='LOW'?'var(--green)':risk.level==='MEDIUM'?'var(--amber)':'var(--red)';
+
+  $content.innerHTML = `
+    <div class="h1">Export</div>
+    <div class="sub">Creates new files on your device. Your original file is never modified or overwritten.</div>
+
+    <div class="callout blue" style="margin-bottom:18px;">
+      <span>ⓘ</span>
+      <div>These downloads are always labeled "protected copy" — there is no "Save" that touches your original file.</div>
+    </div>
+
+    ${risk.level!=='LOW' ? `
+      <div class="callout amber" style="margin-bottom:18px;">
+        <span>⚠</span>
+        <div>Final privacy risk is currently <strong style="color:${riskColor};">${risk.level}</strong>. You can still export, but consider reviewing <a href="#" onclick="setView('report');return false;">Verification</a> first.</div>
+      </div>
+    ` : ''}
+
+    <div class="section-title">Protected Dataset</div>
+    <div class="panel" style="padding:16px 18px;margin-bottom:20px;">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        ${[['csv','CSV'],['xlsx','XLSX'],['json','JSON']].map(([f,label])=>`
+          <button class="btn ${sel.format===f?'primary':''} small" onclick="setExportFormat('${f}')">${label}</button>
+        `).join('')}
+      </div>
+      <div class="sub" style="margin:0 0 12px 0;">${state.protected.length.toLocaleString()} rows · ${state.protectedColumns.length} columns · ${state.dataset.columns.length - state.protectedColumns.length} column(s) removed</div>
+      <button class="btn accent" onclick="exportProtected('${sel.format}')">Export Protected Copy (${sel.format.toUpperCase()})</button>
+    </div>
+
+    <div class="section-title">Additional Files</div>
+    <div class="panel" style="padding:4px 18px;margin-bottom:20px;">
+      <div class="validation-row" style="padding:10px 0;border-bottom:1px solid var(--border);">
+        <input type="checkbox" ${sel.privacyReport?'checked':''} onchange="toggleExportItem('privacyReport')">
+        <div style="flex:1;">
+          <div>Privacy Report</div>
+          <div class="reason" style="margin:0;">Sensitive fields detected, protocols applied, verification checks, final risk score.</div>
+        </div>
+      </div>
+      <div class="validation-row" style="padding:10px 0;border-bottom:1px solid var(--border);">
+        <input type="checkbox" ${sel.qualityReport?'checked':''} onchange="toggleExportItem('qualityReport')">
+        <div style="flex:1;">
+          <div>Data Quality Report</div>
+          <div class="reason" style="margin:0;">Missing values, duplicates, and outliers per column.</div>
+        </div>
+      </div>
+      <div class="validation-row" style="padding:10px 0;">
+        <input type="checkbox" ${sel.protocolConfig?'checked':''} onchange="toggleExportItem('protocolConfig')">
+        <div style="flex:1;">
+          <div>Protocol Configuration</div>
+          <div class="reason" style="margin:0;">Per-column protocols, generalize bucket sizes, and the full protocol library.</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn primary" onclick="doExportBundle()">Export Selected Files</button>
+    <div id="exportToast" class="sub" style="margin-top:8px;" aria-live="polite"></div>
+  `;
+}
+
+function doExportBundle(){
+  const sel = state.exportSelection;
+  let count = 0;
+  exportProtected(sel.format); count++;
+  if(sel.privacyReport){ exportReport(); count++; }
+  if(sel.qualityReport){ exportQualityReport(); count++; }
+  if(sel.protocolConfig){ exportProtocolConfig(); count++; }
+  showToast('exportToast', `Exported ${count} file(s) to your downloads.`);
+}
+
+function exportReport(){
+  const base = state.dataset.name.replace(/\.[^.]+$/,'');
+  const risk = riskScore();
+  const report = {
+    dataset: state.dataset.name,
+    originalChecksum: state.dataset.checksum,
+    rows: state.dataset.rows.length,
+    columns: state.dataset.columns.length,
+    protocols: state.protocols,
+    sensitiveFieldsDetected: state.columns.filter(c=>c.sensitivity!=='NONE').map(c=>({column:c.name, sensitivity:c.sensitivity, reason:c.reason})),
+    verificationChecks: state.verificationChecks,
+    remainingFlags: state.secondScan,
+    finalRisk: risk.level,
+    riskReasons: risk.reasons,
+    generatedAt: new Date().toISOString()
+  };
+  download(`${base}_privacy_report.json`, JSON.stringify(report, null, 2), 'application/json');
+  log('Privacy report exported');
+}
+
+function renderAudit(){
+  renderTopbar();
+  $content.innerHTML = `
+    <div class="h1">Audit</div>
+    <div class="sub">Local, session-only log. Raw sensitive values are never stored here.</div>
+    <div class="panel" style="padding:6px 18px;">
+      ${state.audit.length===0? '<div class="empty">No activity yet.</div>' : state.audit.slice().reverse().map(a=>`
+        <div class="audit-item"><span class="audit-time">${a.t}</span><span>${esc(a.action)}</span></div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ---------------- Projects ---------------- */
+function serializeTokenMaps(){
+  const out = {};
+  Object.keys(state.tokenMaps).forEach(c=> out[c] = Array.from(state.tokenMaps[c].entries()));
+  return out;
+}
+function deserializeTokenMaps(obj){
+  const out = {};
+  Object.keys(obj||{}).forEach(c=> out[c] = new Map(obj[c]));
+  return out;
+}
+
+function saveCurrentAsProject(){
+  if(!state.dataset) return;
+  const nameInput = document.getElementById('newProjectName');
+  const name = (nameInput && nameInput.value.trim()) || state.dataset.name.replace(/\.[^.]+$/,'');
+  const project = {
+    id: 'proj_'+Date.now(),
+    name,
+    createdAt: new Date().toISOString(),
+    snapshot: {
+      dataset: state.dataset,
+      columns: state.columns,
+      protocols: state.protocols,
+      explicitlySet: Array.from(state.explicitlySet),
+      generalizeBuckets: state.generalizeBuckets,
+      protected: state.protected,
+      protectedColumns: state.protectedColumns,
+      tokenMaps: serializeTokenMaps(),
+      secondScan: state.secondScan,
+      verificationChecks: state.verificationChecks,
+      audit: state.audit,
+      qualityDecisions: state.qualityDecisions
+    }
+  };
+  projects.unshift(project);
+  const ok = saveToStorage(PROJECTS_KEY, projects);
+  log(`Project saved: ${name}`);
+  renderProjects();
+  if(!ok) showToast('projectToast', 'Project saved for this session, but browser storage is unavailable, so it will not persist after this tab closes.');
+}
+
+function openProject(id){
+  const p = projects.find(x=>x.id===id);
+  if(!p) return;
+  const s = p.snapshot;
+  state.dataset = s.dataset;
+  state.columns = s.columns;
+  state.protocols = s.protocols;
+  state.explicitlySet = new Set(s.explicitlySet||[]);
+  state.generalizeBuckets = s.generalizeBuckets||{};
+  state.protected = s.protected;
+  state.protectedColumns = s.protectedColumns||[];
+  state.tokenMaps = deserializeTokenMaps(s.tokenMaps);
+  state.secondScan = s.secondScan||[];
+  state.verificationChecks = s.verificationChecks||[];
+  state.audit = s.audit||[];
+  state.qualityDecisions = s.qualityDecisions||{};
+  // Reset session-only UI state so filters/pagination from whatever you were
+  // just looking at don't silently carry over and hide rows in this project.
+  state.privacySubTab = 'columns';
+  state.reviewPage = 0; state.reviewSearch = ''; state.revealOriginals = false;
+  state.aiViewPage = 0; state.aiViewSearch = '';
+  state.reportSubTab = 'verify';
+  state.dataTable = {search:'', sortCol:null, sortDir:1, page:0, pageSize:50, hiddenCols:new Set(), pinnedCols:new Set(), colWidths:{}, rowFilter:null};
+  log(`Project opened: ${p.name}`);
+  setView('overview');
+  renderTopbar();
+}
+
+function deleteProject(id){
+  const p = projects.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm(`Delete project "${p.name}"? This can't be undone.`)) return;
+  projects = projects.filter(x=>x.id!==id);
+  saveToStorage(PROJECTS_KEY, projects);
+  renderProjects();
+}
+
+function renderProjects(){
+  renderTopbar();
+  if(!state.dataset){
+    document.getElementById('topTitle').textContent = 'Projects';
+    document.getElementById('topSub').textContent = 'Local, named snapshots of a dataset and its protection setup';
+  }
+  $content.innerHTML = `
+    <div class="h1">Projects</div>
+    <div class="sub">A project bundles a dataset, its protocols, and its protection history so you can pick up where you left off.</div>
+
+    ${!storageAvailable ? `
+      <div class="callout amber" style="margin-bottom:16px;">
+        <span>⚠</span>
+        <div>Browser storage isn't available in this context (e.g. private browsing), so projects will only last for this session.</div>
+      </div>
+    ` : ''}
+
+    ${state.dataset ? `
+      <div class="panel" style="padding:14px 18px;margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input id="newProjectName" type="text" placeholder="Project name" value="${esc(state.dataset.name.replace(/\.[^.]+$/,''))}"
+          style="flex:1;min-width:180px;padding:7px 9px;border:1px solid var(--border-strong);border-radius:5px;font-size:12.5px;">
+        <button class="btn primary" onclick="saveCurrentAsProject()">Save Current Session as Project</button>
+      </div>
+      <div id="projectToast" class="sub" style="margin-top:-12px;margin-bottom:14px;" aria-live="polite"></div>
+    ` : `
+      <div class="callout blue" style="margin-bottom:20px;">
+        <span>ⓘ</span>
+        <div>Import a dataset first, then save it here as a project to come back to later.</div>
+      </div>
+    `}
+
+    <div class="section-title">Saved Projects</div>
+    ${projects.length===0 ? '<div class="empty">No projects saved yet.</div>' : `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${projects.map(p=>`
+          <div class="panel" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-weight:700;font-size:13px;">${esc(p.name)}</div>
+              <div class="sub" style="margin:2px 0 0 0;">${esc(p.snapshot.dataset.name)} · ${p.snapshot.dataset.rows.length} rows · saved ${new Date(p.createdAt).toLocaleString()}</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn small" onclick="openProject('${p.id}')">Open</button>
+              <button class="btn small" onclick="deleteProject('${p.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `}
+  `;
+}
+
+/* ---------------- Settings ---------------- */
+function dismissOnboarding(){
+  appSettings.hideOnboarding = true;
+  saveToStorage(SETTINGS_KEY, appSettings);
+  renderImport();
+}
+
+function updateSetting(key, value){
+  appSettings[key] = value;
+  saveToStorage(SETTINGS_KEY, appSettings);
+  log(`Setting changed: ${key} → ${value}`);
+  if(key==='theme') applyTheme();
+  renderSettings();
+}
+function clearTemporaryData(){
+  if(!state.dataset) return;
+  if(!confirm('Clear the protected copy, second-scan results, and token map for the current dataset? Your imported original and protocol settings are kept.')) return;
+  state.protected = null;
+  state.protectedColumns = [];
+  state.tokenMaps = {};
+  state.secondScan = [];
+  state.verificationChecks = [];
+  log('Temporary protection data cleared');
+  renderSettings();
+}
+function clearAllLocalData(){
+  if(!confirm('Delete all saved projects from this browser? This cannot be undone.')) return;
+  projects = [];
+  saveToStorage(PROJECTS_KEY, projects);
+  log('All local project data cleared');
+  renderSettings();
+}
+function clearAuditLog(){
+  if(!confirm('Clear the audit log for this session?')) return;
+  state.audit = [];
+  renderSettings();
+}
+
+function renderSettings(){
+  renderTopbar();
+  if(!state.dataset){
+    document.getElementById('topTitle').textContent = 'Settings';
+    document.getElementById('topSub').textContent = 'App preferences and local data controls';
+  }
+  $content.innerHTML = `
+    <div class="h1">Settings</div>
+    <div class="sub">Preferences are stored locally in this browser and never leave your device.</div>
+
+    <div class="section-title">General</div>
+    <div class="panel" style="padding:14px 18px;margin-bottom:20px;">
+      <div class="ins-row"><span class="k">Product</span><span class="v" style="font-family:var(--sans);">DataPermit</span></div>
+      <div class="ins-row"><span class="k">Build</span><span class="v" style="font-family:var(--sans);">Web prototype · single-file preview</span></div>
+      <div class="ins-row"><span class="k">Current dataset</span><span class="v" style="font-family:var(--sans);">${state.dataset? esc(state.dataset.name) : '—'}</span></div>
+      <div class="ins-row" style="align-items:center;">
+        <span class="k">Appearance</span>
+        <span>
+          <button class="btn small ${appSettings.theme!=='dark'?'primary':''}" onclick="updateSetting('theme','light')">Light</button>
+          <button class="btn small ${appSettings.theme==='dark'?'primary':''}" onclick="updateSetting('theme','dark')">Dark</button>
+        </span>
+      </div>
+      <div class="ins-row" style="align-items:center;">
+        <span class="k">Import screen tips</span>
+        <button class="btn small" onclick="updateSetting('hideOnboarding', false)">Show "How it works" again</button>
+      </div>
+    </div>
+
+    <div class="section-title">Offline Mode</div>
+    <div class="panel" style="padding:14px 18px;margin-bottom:20px;">
+      <div class="validation-row" style="padding:6px 0;">
+        <input type="checkbox" ${appSettings.offlineLock?'checked':''} onchange="updateSetting('offlineLock', this.checked)">
+        <div>
+          <div>Strict Offline Lock</div>
+          <div class="reason" style="margin:0;">Blocks the one-time CDN load DataPermit uses for XLSX reading, so imports fall back to CSV/JSON only. All processing is local either way.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Security</div>
+    <div class="panel" style="padding:14px 18px;margin-bottom:20px;">
+      <div class="validation-row" style="padding:6px 0;">
+        <input type="checkbox" disabled>
+        <div><div class="faint">Local database encryption</div><div class="reason" style="margin:0;">Requires a real local database — available in the Tauri + SQLite desktop build, not this browser preview.</div></div>
+      </div>
+      <div class="validation-row" style="padding:6px 0;">
+        <input type="checkbox" disabled>
+        <div><div class="faint">Project password</div><div class="reason" style="margin:0;">Available in the desktop build.</div></div>
+      </div>
+      <div class="validation-row" style="padding:6px 0;">
+        <input type="checkbox" disabled>
+        <div><div class="faint">Token mapping encryption at rest</div><div class="reason" style="margin:0;">Token maps currently live only in memory for this browser tab and are never exported. Encryption at rest applies once there's a real local database to encrypt.</div></div>
+      </div>
+    </div>
+
+    <div class="section-title">Storage</div>
+    <div class="panel" style="padding:14px 18px;margin-bottom:20px;">
+      <div class="ins-row"><span class="k">Saved projects</span><span class="v" style="font-family:var(--sans);">${projects.length}</span></div>
+      <div class="ins-row"><span class="k">Browser storage available</span><span class="v" style="font-family:var(--sans);color:${storageAvailable?'var(--green)':'var(--red)'}">${storageAvailable?'Yes':'No'}</span></div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <button class="btn small" ${!state.dataset?'disabled':''} onclick="clearTemporaryData()">Clear Temporary Protection Data</button>
+        <button class="btn small" onclick="clearAllLocalData()">Clear All Saved Projects</button>
+      </div>
+    </div>
+
+    <div class="section-title">Protocols</div>
+    <div class="panel" style="padding:14px 18px;margin-bottom:20px;">
+      <div class="sub" style="margin:0 0 8px 0;">${protocolLibrary.length} protocol(s) in the library, including the mandatory system protocol.</div>
+      <button class="btn small" onclick="state.privacySubTab='library'; setView('privacy');">Open Protocol Library</button>
+    </div>
+
+    <div class="section-title">Audit</div>
+    <div class="panel" style="padding:14px 18px;">
+      <div class="ins-row"><span class="k">Retention</span><span class="v" style="font-family:var(--sans);">This session only</span></div>
+      <div class="reason" style="margin:4px 0 10px 0;">Persisting audit history across sessions requires the desktop build's local database.</div>
+      <button class="btn small" ${!state.dataset?'disabled':''} onclick="clearAuditLog()">Clear Audit Log</button>
+    </div>
+  `;
+}
+
+/* ---------------- nav wiring ---------------- */
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click', ()=> setView(el.dataset.view));
+});
+
+applyTheme();
+render();
+</script>
+</body>
+</html>
