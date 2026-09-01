@@ -105,7 +105,7 @@ Presidio-based detection, SQLCipher-encrypted local storage — that's a
 separate build best done with a local toolchain (e.g. via Claude Code), and
 `ARCHITECTURE.md` lays out how the logic in this prototype maps onto that.
 
-##Screenshots 
+## ScreenShots
 
 <img width="1365" height="725" alt="OP1" src="https://github.com/user-attachments/assets/0885e60b-b8d2-4c40-b5c4-29580d3c153a" />
 <img width="1365" height="726" alt="OP2" src="https://github.com/user-attachments/assets/559761d4-6867-4c88-83ce-4436a5f7a0b6" />
